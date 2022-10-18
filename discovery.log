@@ -1,0 +1,9 @@
+
+   INFO  Processing jobs from the [discovery] queue.  
+
+  2022-10-18 20:41:46 App\Jobs\Discovery\AmassJob ............ 2,340.93ms DONE
+  2022-10-18 20:41:48 App\Jobs\Commands\AmassCommand ......... 7,952.19ms DONE
+  2022-10-18 20:41:56 App\Jobs\Commands\SubfinderCommand ..... 8,774.79ms DONE
+  2022-10-18 20:42:05 App\Jobs\Commands\AssetCommand ........ 32,362.91ms DONE
+  2022-10-18 20:42:37 App\Jobs\Commands\AssetCommand ........ 39,792.42ms DONE
+  2022-10-18 20:43:18 App\Jobs\Commands\GauCommand

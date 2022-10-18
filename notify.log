@@ -1,0 +1,33 @@
+
+   INFO  Processing jobs from the [listeners] queue.  
+
+  2022-10-18 20:41:42 App\Listeners\ScopeEntryNotification ..... 631.57ms DONE
+  2022-10-18 20:41:59 App\Listeners\ResourceNotification ....... 570.88ms DONE
+  2022-10-18 20:42:00 App\Listeners\ResourceNotification ....... 182.70ms DONE
+  2022-10-18 20:42:01 App\Listeners\ResourceNotification ....... 145.24ms DONE
+  2022-10-18 20:42:03 App\Listeners\ResourceNotification ....... 486.18ms DONE
+  2022-10-18 20:42:03 App\Listeners\ResourceNotification ....... 809.80ms DONE
+  2022-10-18 20:42:04 App\Listeners\ResourceNotification ....... 465.92ms DONE
+  2022-10-18 20:42:05 App\Listeners\ResourceNotification ....... 213.43ms DONE
+  2022-10-18 20:42:05 App\Listeners\ResourceNotification ....... 250.63ms DONE
+  2022-10-18 20:42:06 App\Listeners\ResourceNotification ....... 201.99ms DONE
+  2022-10-18 20:42:06 App\Listeners\ResourceNotification ....... 212.29ms DONE
+  2022-10-18 20:42:07 App\Listeners\ResourceNotification ....... 254.36ms DONE
+  2022-10-18 20:42:07 App\Listeners\ResourceNotification ....... 842.90ms DONE
+  2022-10-18 20:42:08 App\Listeners\ResourceNotification ....... 130.67ms DONE
+  2022-10-18 20:42:08 App\Listeners\ResourceNotification ....... 114.75ms DONE
+  2022-10-18 20:42:09 App\Listeners\ResourceNotification ....... 158.92ms DONE
+  2022-10-18 20:42:09 App\Listeners\ResourceNotification ....... 124.32ms DONE
+  2022-10-18 20:42:09 App\Listeners\ResourceNotification ....... 168.57ms DONE
+  2022-10-18 20:42:09 App\Listeners\ResourceNotification ....... 347.03ms DONE
+  2022-10-18 20:42:10 App\Listeners\ResourceNotification ........ 96.47ms DONE
+  2022-10-18 20:42:10 App\Listeners\ResourceNotification ....... 110.00ms DONE
+  2022-10-18 20:42:10 App\Listeners\ResourceNotification ....... 146.72ms DONE
+  2022-10-18 20:42:10 App\Listeners\ResourceNotification ....... 101.82ms DONE
+  2022-10-18 20:42:11 App\Listeners\ResourceNotification ....... 379.54ms DONE
+  2022-10-18 20:42:11 App\Listeners\ResourceNotification ....... 121.85ms DONE
+  2022-10-18 20:42:11 App\Listeners\ResourceNotification ....... 128.76ms DONE
+  2022-10-18 20:42:12 App\Listeners\ResourceNotification ....... 157.16ms DONE
+  2022-10-18 20:42:12 App\Listeners\ResourceNotification ....... 335.85ms DONE
+  2022-10-18 20:44:50 App\Listeners\ResourceNotification .... 28,357.67ms DONE
+  2022-10-18 20:45:19 App\Listeners\ResourceNotification ....... 374.56ms DONE
