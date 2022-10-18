@@ -36,7 +36,7 @@ class AmassCommand implements ShouldQueue, ShouldBeUnique
 		$this->entry=$entry;
 		$this->onQueue('discovery');
 		$this->domain=$entry->argument;
-		$this->scanner_path=base_path()."/scanners/amass_linux_amd64/";
+		$this->scanner_path=base_path()."/scanners/amass_linux/";
 		$this->scanner=$this->scanner_path."amass";
 		$this->time_limit=2400;
     }

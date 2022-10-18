@@ -51,7 +51,7 @@ class AmassJob implements ShouldQueue, ShouldBeUnique
 		
 		$this->scope_entry=$scope_entry;
 		$this->domain=$this->scope_entry->source;
-		$this->scanner_path=base_path()."/scanners/amass_linux_amd64/";
+		$this->scanner_path=base_path()."/scanners/amass_linux/";
 		$this->scanner=$this->scanner_path."amass";
 		$this->time_limit=1800;
     }
