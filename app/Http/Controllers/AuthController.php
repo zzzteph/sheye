@@ -34,7 +34,7 @@ class AuthController extends Controller
 			}
 			
            Auth::loginUsingId($user->id);
-           return redirect()->intended('/');
+           return redirect()->route('dashboard'); 
 
 	}
 	
