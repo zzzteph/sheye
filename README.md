@@ -81,7 +81,9 @@ Below you can find how to compile assetfinder for RaspberiPI (arm64)
 ```
 git clone https://github.com/tomnomnom/assetfinder
 cd assetfinder
-GOOS=linux GOARCH=arm64 go build
+go mod init go.mod
+go mod tidy
+GOOS=linux GOARCH=arm64 go build -o assetfinder
 mv assetfinder ../
 cd ../
 rm -rf assetfinder/
