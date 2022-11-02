@@ -1,31 +1,78 @@
 
 ## Reveal the hidden
-**ShrewdEyeScanner** (sheye) is a set of utilities bundled into a single automated workflow to improve, simplify, and speed up resource discovery and vulnerabilities finding.
+**ShrewdEye** (sheye) is a set of utilities bundled into a single automated workflow to improve, simplify, and speed up resource discovery and vulnerabilities finding.
 
 
 ## Setup
 
-*TODO - Dockerize app to simplify installation.*
 
-
-Install requirement dependencies
-
-```
-sudo apt-get install python3-dev python3-pip nginx php-fpm golang default-jdk wget maven nginx curl unzip xvfb libxi6 libgconf-2-4 python2.7 php-cli unzip screen mc mariadb-server php-zip php-mbstring php-xml php-dev git php-mysql php-pdo php-curl php-bcmath php-dom php-ctype chromium-chromedriver chromium-browser nmap
-```
-
-Install **composer**
+### Requirements
 
 
 ```
-sudo php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-sudo php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-sudo php composer-setup.php
-sudo php -r "unlink('composer-setup.php');"
-sudo mv composer.phar /usr/local/bin/composer
+apt-get install python3-dev python3-pip nginx  default-jdk wget maven nginx curl unzip xvfb libxi6 libgconf-2-4 python2.7  unzip screen mc mariadb-server  git   chromium-browser nmap mc
+```
+
+If you use **Ubuntu** based distro
+
+``` apt get install chromium-chromedriver```
+
+If you use **Debian** based distro
+
+``` apt get install chromium-driver```
+
+### PHP 8
+
+You need to install ***php8*** for laravel to work.
+
+If you use Debian based distro or ***php8*** is missing, you can do next
+
+```
+sudo apt install -y lsb-release ca-certificates apt-transport-https software-properties-common gnupg2
+echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/sury-php.list
+curl -fsSL  https://packages.sury.org/php/apt.gpg| sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/sury-keyring.gpg
+apt install php8.1-fpm php8.1-cli php8.1-zip php8.1-mbstring php8.1-xml php8.1-dev php8.1-mysql php8.1-pdo php8.1-curl php8.1-bcmath php8.1-dom php8.1-ctype php8.1-cli
+```
+
+Or you can just install 
+
+```
+apt install php-fpm php-cli php-zip php-mbstring php-xml php-dev php-mysql php-pdo php-curl php-bcmath php-dom php-ctype php-cli
 ```
 
 
+### GO
+
+
+You need to install **golang >= 1.9**
+
+
+For example you can use script below to install **golang** for **ARM**. Change arch from **arm64** to **amd64** for x64 architecture.
+```
+wget "https://go.dev/dl/go1.19.2.linux-arm64.tar.gz" -4
+tar -C /usr/local -xvf "go1.19.2.linux-arm64.tar.gz"
+rm "go1.19.2.linux-arm64.tar.gz"
+cat >> ~/.bashrc << 'EOF'
+export GOPATH=$HOME/go
+export PATH=/usr/local/go/bin:$PATH:$GOPATH/bin
+EOF
+
+source ~/.bashrc
+rm -rf /usr/local/go
+```
+
+### Composer
+
+
+```
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '55ce33d7678c5a611085589f1f3ddf8b3c52d662cd01d4ba75c0ee0459970c2200a51f492d557530c71c15d8dba01eae') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+mv composer.phar /usr/local/bin/composer
+```
+
+### Extract archieve
 
 Extract sources to folder, F.E **/var/www/html**
 
@@ -58,10 +105,10 @@ composer install
 php artisan migrate
 ```
 
-### Scanners setup
+### Scanners setup 
 
 
-All scanners should be located at **scanners** folder (**/var/www/html/scanners**)
+All scanners should be located at **scanners** folder (**/var/www/html/scanners**). You can find example compilation for **arm64**, just change to **amd64** for x64 architecture.
 
 1. **amass**
 
@@ -76,17 +123,17 @@ rm -f amass_linux_arm64.zip
 
 2. **assetfinder**
 
-Below you can find how to compile assetfinder for RaspberiPI (arm64)
+Below you can find how to compile assetfinder for RaspberiPI (**arm64**)
 
 ```
-git clone https://github.com/tomnomnom/assetfinder
-cd assetfinder
+git clone https://github.com/tomnomnom/assetfinder asset
+cd asset
 go mod init go.mod
 go mod tidy
 GOOS=linux GOARCH=arm64 go build -o assetfinder
 mv assetfinder ../
 cd ../
-rm -rf assetfinder/
+rm -rf asset/
 ```
 
 3. **subfinder**
@@ -100,22 +147,26 @@ rm -f subfinder_2.5.4_linux_arm64.zip
 4. **httpx**
 
 ```
-sudo go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
+mv /root/go/bin/httpx /var/www/html/scanners/
 ```
 
 5. **nuclei**
 ```
-sudo go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+mv /root/go/bin/nuclei /var/www/html/scanners/
 ```
 
 6. **dnsx**
 ```
-sudo go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
+mv /root/go/bin/dnsx /var/www/html/scanners/
 ```
 
 7. **gau**
 ```
-sudo go install github.com/lc/gau/v2/cmd/gau@latest
+go install github.com/lc/gau/v2/cmd/gau@latest
+mv /root/go/bin/gau /var/www/html/scanners/
 ```
 
 8. **screenshoter**
@@ -153,7 +204,7 @@ Configure nginx to serve the app
 server {
 listen 80;
     server_name _;
-    root /var/www/html/public;
+    root /var/www/sheye/public;
     large_client_header_buffers 4 16k;
     index index.php;
 
@@ -180,3 +231,24 @@ listen 80;
     }
 }
 ```
+
+
+
+### Launch workers process
+
+
+Workers are located at **workers.sh** file. You need to lauch that file in background or with **screen**.
+
+```
+cd /var/www/html
+screen -S scanner
+sh worker.sh
+```
+
+
+
+
+
+
+
+

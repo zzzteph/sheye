@@ -22,8 +22,5 @@ do
 
 	php artisan schedule:run
 
-
-
-
-  sleep 1
+  sleep 60
 done
