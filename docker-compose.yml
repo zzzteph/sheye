@@ -1,0 +1,52 @@
+version: "3.7"
+services:
+  app:
+    build:
+      args:
+        user: sheye
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: sheye
+    container_name: sheye-app
+    restart: unless-stopped
+    working_dir: /var/www/sheye
+    volumes:
+      - ./:/var/www/sheye
+    networks:
+      - sheye-network
+
+  db:
+    image: mysql:5.7
+    container_name: sheye-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: sheye
+      MYSQL_ROOT_PASSWORD: sheye
+      MYSQL_PASSWORD: sheye
+      MYSQL_USER: sheye
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - sheye-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: sheye-nginx
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ./:/var/www/sheye
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      - sheye-network
+
+networks:
+  sheye-network:
+    driver: bridge
+volumes:
+  dbdata:
+    driver: local
