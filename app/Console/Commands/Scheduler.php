@@ -7,12 +7,8 @@ use App\Models\Scope;
 use App\Models\ScopeEntry;
 use App\Models\Resource;
 use App\Models\Schedule;
-use App\Models\Queue;
-use App\Models\Report;
-use App\Models\User;
-use App\Models\Service;
-use App\Models\Screenshot;
-
+use App\Models\Template;
+use App\Jobs\LaunchScanJob;
 class Scheduler extends Command
 {
     /**
@@ -47,44 +43,7 @@ class Scheduler extends Command
 		{
 			if($schedule->scope!==null)
 			{
-					foreach($schedule->scope->scope_entries as $entry)
-					{
-						$tmp=new Queue;
-						$tmp->object_type="scope_entry";
-						$tmp->object_id=$entry->id;
-						$tmp->user_id=$entry->scope->user_id;
-						$tmp->type="asset";
-						$tmp->scope_id=$entry->scope_id;
-						$tmp->save();
-						
-						
-												$tmp=new Queue;
-						$tmp->object_type="scope_entry";
-						$tmp->object_id=$entry->id;
-						$tmp->user_id=$entry->scope->user_id;
-						$tmp->type="subfinder";
-						$tmp->scope_id=$entry->scope_id;
-						$tmp->save();
-						
-						
-												$tmp=new Queue;
-						$tmp->object_type="scope_entry";
-						$tmp->object_id=$entry->id;
-						$tmp->user_id=$entry->scope->user_id;
-						$tmp->type="wayback";
-						$tmp->scope_id=$entry->scope_id;
-						$tmp->save();
-						
-						
-												$tmp=new Queue;
-						$tmp->object_type="scope_entry";
-						$tmp->object_id=$entry->id;
-						$tmp->user_id=$entry->scope->user_id;
-						$tmp->type="amass";
-						$tmp->scope_id=$entry->scope_id;
-						$tmp->save();
-
-					}
+					LaunchScanJob::dispatch($schedule->scope,$schedule->template_id);
 			}
 		}
 		

@@ -14,6 +14,9 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommandsController;
 use App\Http\Controllers\FindingsController;
+use App\Http\Controllers\ScannersController;
+use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\ServicesController;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -24,11 +27,10 @@ use Laravel\Socialite\Facades\Socialite;
 
 Route::middleware(['auth'])->group(function () {
 Route::get('/dashboard',[ScopesController::class, 'index'])->name('dashboard');
+
 Route::get('/scopes',[ScopesController::class, 'index'])->name('scopes');
 Route::get('/scopes/new',[ScopesController::class, 'new'])->name('scopes-add-new-template');
 Route::post('/scopes/create',[ScopesController::class, 'create'])->name('scopes-create');
-
-Route::get('/scopes/{id}/edit',[ScopesController::class, 'edit'])->name('scopes-edit');
 
 
 Route::put('/scopes/{id}/edit',[ScopesController::class, 'update'])->name('scopes-update');
@@ -78,14 +80,41 @@ Route::get('/scopes/{scope_id}/screenshots',[ResponseController::class, 'scope_s
 
 
  
-Route::post('/scan/{scope_id}/{type}',[ScansController::class, 'scope_scan'])->name('scope-scan');
-Route::post('/scan/{scope_id}/{scope_entry_id}/{type}',[ScansController::class, 'scope_entry_scan'])->name('scope-entry-scan');
-Route::post('/scan/{scope_id}/{scope_entry_id}/{$resource_id}/{type}',[ScansController::class, 'resource_scan'])->name('resource-scan');
+Route::post('/scan/{scope_id}',[ScansController::class, 'scope_scan_launch'])->name('scope-scan-launch');
+Route::delete('/scan/{scope_id}',[ScansController::class, 'scope_scan_stop'])->name('scope-scan-stop');
 
-Route::get('/findings/{scope_id}/{severity}/{type}',[FindingsController::class, 'scope_list'])->name('scope-findings');
-Route::get('/findings/{scope_id}/{scope_entry_id}/{severity}/{type}',[FindingsController::class, 'scope_entry_list'])->name('scope-entry-findings');
+
+Route::get('/findings/{scope_id}/{severity}',[FindingsController::class, 'scope_list'])->name('scope-findings');
+Route::get('/findings/{scope_id}/{scope_entry_id}/{severity}',[FindingsController::class, 'scope_entry_list'])->name('scope-entry-findings');
  
 Route::get('/jobs/{type}',[JobsController::class, 'monitor'])->name('view-jobs');
+
+
+//Scanners management
+Route::get('/scanners/types',[ScannersController::class, 'types'])->name('scanners-types');
+Route::get('/scanners/list',[ScannersController::class, 'list'])->name('scanners-list');
+Route::get('/scanners/new',[ScannersController::class, 'new'])->name('scanners-new');
+Route::post('/scanners',[ScannersController::class, 'create'])->name('scanners-create');
+Route::get('/scanners/{id}',[ScannersController::class, 'view'])->name('scanners-view');
+Route::put('/scanners/{id}',[ScannersController::class, 'update'])->name('scanners-update');
+Route::delete('/scanners/{id}',[ScannersController::class, 'delete'])->name('scanners-delete');
+  
+
+
+
+Route::get('/templates/new',[TemplateController::class, 'new'])->name('templates-new');
+Route::get('/templates/list',[TemplateController::class, 'list'])->name('templates-list');
+Route::post('/templates/launch',[TemplateController::class, 'launch'])->name('templates-launch');
+
+Route::post('/templates',[TemplateController::class, 'create'])->name('templates-create');
+Route::get('/templates/{id}',[TemplateController::class, 'view'])->name('templates-view');
+Route::put('/templates/{id}',[TemplateController::class, 'update'])->name('templates-update');
+Route::delete('/templates/{id}',[TemplateController::class, 'delete'])->name('templates-delete');
+
+
+
+
+Route::get('/services/{id}',[ServicesController::class, 'list'])->name('services-list');
 
 
 

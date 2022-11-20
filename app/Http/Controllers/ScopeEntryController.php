@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Scope;
 use App\Models\ScopeEntry;
+use App\Models\Template;
+use App\Models\ScopeTemplate;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -21,7 +23,8 @@ class ScopeEntryController extends Controller
 	{
 		$scope=Scope::where('user_id', Auth::id())->where('id',$scope_id)->firstOrFail();
 		$scope_entries=ScopeEntry::where('scope_id',$scope->id)->orderBy('updated_at','desc')->paginate(25);
-		return view('scope_entries.list',['scope' =>  $scope,'scope_entries'=>$scope_entries]);
+	
+		return view('scope_entries.list',['scope' =>  $scope,'scope_entries'=>$scope_entries,'templates' => Template::all()]);
 		
 	}
 

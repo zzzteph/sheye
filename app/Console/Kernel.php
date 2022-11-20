@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-		$schedule->command('push:queue')->everyMinute();
+		$schedule->command('push:queue')->withoutOverlapping();
 		$schedule->command('wipe:queue')->hourly();
 		$schedule->command('scheduler:run daily')->daily();
 		$schedule->command('scheduler:run weekly')->weekly();

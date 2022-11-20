@@ -19,9 +19,9 @@ class ScopeEntry extends Model
     {
         return $this->hasMany(Service::class);
     }
-			public function findings()
+			public function outputs()
     {
-        return $this->hasMany(Finding::class);
+        return $this->hasMany(Output::class);
     }
 	public function resources()
     {
@@ -44,7 +44,7 @@ class ScopeEntry extends Model
         return Queue::where('object_type','scope_entry')->where('object_id',$this->id)->get();
     }
 	
-		public function service_export()
+	public function service_export()
     {
         return DB::table('services')
             ->join('resources', 'services.resource_id', '=', 'resources.id')

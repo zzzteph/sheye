@@ -32,5 +32,8 @@ class Queue extends Model
     {
         return Service::find($this->object_id);
     }
-	
+			public function scanner_entry()
+    {
+         return $this->belongsTo(ScannerEntry::class);
+    }
 }

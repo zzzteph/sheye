@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use App\Models\Schedule;
 use App\Models\Scope;
 use App\Models\ScopeEntry;
+use App\Models\Template;
 class ScheduleController extends Controller
 {
      
@@ -15,8 +16,12 @@ class ScheduleController extends Controller
 
  	public function list()
 	{
-		return view('schedule.list',['schedulers'=>Schedule::where('user_id', Auth::id())->get(),'scopes'=>Scope::where('user_id', Auth::id())->get()]);
+		return view('schedule.list',['templates'=>Template::all(),'schedulers'=>Schedule::where('user_id', Auth::id())->get(),'scopes'=>Scope::where('user_id', Auth::id())->get()]);
 	}
+	
+	
+	
+	
 	
 
 
@@ -25,10 +30,12 @@ class ScheduleController extends Controller
 		
 		$validated = $request->validate([
 			'frequency' => 'required',
-			'scope' => 'required'
+			'scope' => 'required',
+			'template' => 'required'
 			
 		]);
 		$scope=Scope::where('user_id', Auth::id())->where('id',$request->input('scope'))->firstOrFail();
+		$template=Template::where('id',$request->input('template'))->firstOrFail();
 		$scheduler=new Schedule;
 		
 		switch($request->input('frequency'))
@@ -41,7 +48,7 @@ class ScheduleController extends Controller
 		}	
 		$scheduler->scope_id=$scope->id;
 		$scheduler->user_id=Auth::id();
-		$scheduler->type="discovery";
+		$scheduler->template_id=$template->id;
 		$scheduler->save();		
 		return redirect()->back();
 	}

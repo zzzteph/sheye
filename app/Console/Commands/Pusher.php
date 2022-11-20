@@ -215,14 +215,20 @@ class Pusher extends Command
 					{
 						$queue->status="queued";
 						$queue->save();
-						switch($queue->type)
+						//generating reflection
+						$job_class = $queue->scanner_entry->scanner->class;
+						$job=null;
+						if($queue->scanner_entry->scanner->has_arguments)
 						{
-							case "asset":	$this->asset($queue);break;
-							case "amass":	$this->amass($queue);break;
-							case "subfinder":$this->subfinder($queue);break;
-							case "wayback":$this->wayback($queue);break;
-							case "dnsb":$this->dnsb($queue);break;
+							$job_class::dispatch($queue,$queue->scanner_entry->arguments);
 						}
+						else
+						{
+							$job_class::dispatch($queue);
+						}
+					
+			
+					
 
 						$user_package[$user->id]--;
 						echo "Pushed".PHP_EOL;
@@ -248,11 +254,16 @@ class Pusher extends Command
 						{
 							$queue->status="queued";
 							$queue->save();
-							switch($queue->type)
+							//generating reflection
+							$job_class = $queue->scanner_entry->scanner->class;
+							$job=null;
+							if($queue->scanner_entry->scanner->has_arguments)
 							{
-								case "nmap":	$this->nmap($queue);break;	
-								case "nuclei":	$this->nuclei($queue);break;	
-								case "nmap_nuclei":	$this->nmap_nuclei($queue);break;	
+								$job_class::dispatch($queue,$queue->scanner_entry->arguments);
+							}
+							else
+							{
+								$job_class::dispatch($queue);
 							}
 
 							$user_package[$user->id]--;
@@ -277,9 +288,16 @@ class Pusher extends Command
 							
 							$queue->status="queued";
 							$queue->save();
-							switch($queue->type)
+							//generating reflection
+							$job_class = $queue->scanner_entry->scanner->class;
+							
+							if($queue->scanner_entry->scanner->has_arguments)
 							{
-								case "analyze":	$this->analyze($queue);break;	
+								$job_class::dispatch($queue,$queue->scanner_entry->arguments);
+							}
+							else
+							{
+								$job_class::dispatch($queue);
 							}
 							
 							$user_package[$user->id]--;

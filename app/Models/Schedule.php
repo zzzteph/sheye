@@ -16,6 +16,11 @@ class Schedule extends Model
         return $this->belongsTo(Scope::class);
     }
 	
+		public function template()
+    {
+        return $this->belongsTo(Template::class);
+    }
+	
 	
 	
 }

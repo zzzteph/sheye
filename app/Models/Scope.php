@@ -12,15 +12,18 @@ class Scope extends Model
 	use SoftDeletes;
 	
 	
-
+	public function scope_template()
+    {
+        return $this->hasOne(ScopeTemplate::class);
+    }
 	
 	public function services()
     {
         return $this->hasMany(Service::class);
     }
-			public function findings()
+			public function outputs()
     {
-        return $this->hasMany(Finding::class);
+        return $this->hasMany(Output::class);
     }
 	public function resources()
     {
@@ -60,5 +63,12 @@ class Scope extends Model
 		return $this->responses()->where('size','>',10592)->count();
     }
 	
-	
+
+		public function getProgressAttribute()
+    {
+
+		return $this->queues()->where('status','!=', 'done')->count();
+
+		
+    }
 }

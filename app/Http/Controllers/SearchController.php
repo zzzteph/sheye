@@ -16,7 +16,7 @@ class SearchController extends Controller
 	
 	public function scope_entries_search(Request $request,$scope_id)
 	{
-				$validated = $request->validate([
+		$validated = $request->validate([
 			'term' => 'required|max:64|min:4'
 		]);
 		

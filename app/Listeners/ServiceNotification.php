@@ -34,13 +34,25 @@ class ServiceNotification
 			$service=Service::find($event->service->id);
 			if($service!==null && $service->resource!=null &&  $service->resource->scope_entry!=null && $service->resource->scope_entry->scope!=null)
 			{
-				$tmp=new Queue;
-				$tmp->object_type="service";
-				$tmp->object_id=$service->id;
-				$tmp->user_id=$service->resource->scope_entry->scope->user_id;
-				$tmp->type="analyze";
-				$tmp->scope_id=$service->resource->scope_entry->scope->id;
-				$tmp->save();
+				
+			$scope=$service->resource->scope_entry->scope;
+			$template=$scope->scope_template->template;
+				
+				foreach($template->template_entries as $entry)
+				{
+				
+
+					if($entry->scanner_entry->scanner->type!='service')continue;
+					$tmp=new Queue;
+					$tmp->object_type="service";
+					$tmp->object_id=$service->id;
+					$tmp->user_id=$service->resource->scope_entry->scope->user_id;
+					$tmp->scanner_entry_id=$entry->scanner_entry->id;
+					$tmp->scope_id=$service->resource->scope_entry->scope->id;
+									$tmp->type="chain";
+					$tmp->save();	
+				}
+
 			}
     }
 }

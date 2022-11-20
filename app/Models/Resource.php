@@ -34,9 +34,9 @@ class Resource extends Model
         return $this->hasMany(Response::class)->where('size','!=',0);
     }
 	
-		public function findings()
+		public function outputs()
     {
-        return $this->hasMany(Finding::class);
+        return $this->hasMany(Output::class);
     }
 	
 	public function responses()

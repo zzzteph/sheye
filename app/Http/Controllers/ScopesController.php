@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Scope;
 use App\Models\ScopeEntry;
- 
+use App\Models\Template;
+use App\Models\ScopeTemplate;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -19,22 +20,26 @@ class ScopesController extends Controller
      
    public function index()
  { 
-    return view('dashboard',['scopes' =>  Scope::where('user_id', Auth::id())->orderBy('id', 'desc')->paginate(10)]);
+    return view('dashboard',['templates'=>Template::all(),'scopes' =>  Scope::where('user_id', Auth::id())->orderBy('id', 'desc')->paginate(10)]);
  }
  
  	public function new()
 	{
-		return view('scopes.new');
+		return view('scopes.new',['templates' => Template::all()]);
 	}
 
  	public function edit($id)
 	{
 		$scope=Scope::where('user_id', Auth::id())->where('id',$id)->firstOrFail();
-		$scope_entries=ScopeEntry::where('scope_id',$scope->id)->orderBy('created_at', 'desc')->paginate(10);
+		$scope_entries=ScopeEntry::where('scope_id',$scope->id)->orderBy('source', 'asc')->paginate(10);
 		return view('scopes.edit',[
 		'scope' =>  $scope,
-		'scope_entries' =>$scope_entries ]);
+		'scope_entries' =>$scope_entries,
+		'templates' => Template::all()		]);
 	}
+	
+	
+
  	public function delete($id)
 	{
 
@@ -53,10 +58,30 @@ class ScopesController extends Controller
 	{
 		$scope=Scope::where('user_id', Auth::id())->where('id',$id)->firstOrFail();
 		$validated = $request->validate([
-			'name' => 'required|max:64|min:4'
+			'name' => 'required|max:64|min:4',
+			'template' => 'required'
 		]);
 		$scope->name=$request->input('name');
 		$scope->save();	
+		
+		Template::findOrFail($request->input('template'));
+
+		if($scope->scope_template==null)
+		{
+			$scope_template=new ScopeTemplate;
+			$scope_template->template_id=$request->input('template');
+			$scope_template->scope_id=$scope->id;
+			$scope_template->save();
+		}
+		else
+		{
+			$scope->scope_template->template_id=$request->input('template');
+			$scope->scope_template->save();
+		}
+		
+		
+		
+		
 		return redirect()->route('scopes-edit',['id' =>$scope->id]);
 	}
 
@@ -188,7 +213,8 @@ class ScopesController extends Controller
 	{
 		$validated = $request->validate([
 			'name' => 'required|max:64|min:4',
-			'domains' => 'required|max:64000'
+			'domains' => 'required|max:64000',
+			'template' => 'required'
 		]);
 		
 		$domains=explode(PHP_EOL,$request->input('domains'));
@@ -216,13 +242,17 @@ class ScopesController extends Controller
 			return back()->withErrors(['errors' => $msg]);
 		}
 
-		
+		Template::findOrFail($request->input('template'));
 		
 		$scope=new Scope;
 		$scope->name=$request->input('name');
 		$scope->user_id=Auth::id();
 		$scope->save();
 		
+		$scope_template=new ScopeTemplate;
+		$scope_template->template_id=$request->input('template');
+		$scope_template->scope_id=$scope->id;
+		$scope_template->save();
 		
 		
 		foreach($domains as $domain)
@@ -240,9 +270,9 @@ class ScopesController extends Controller
 			 
 		}
 		if($error==FALSE)
-			return redirect()->route('scopes-edit',['id' =>$scope->id]);
+			return redirect()->route('scope-entry-list',['scope_id' =>$scope->id]);
 		else
-			return redirect()->route('scopes-edit',['id' =>$scope->id])->withErrors(['errors' =>"Input domains have incorrect format:".$error]);
+			return redirect()->route('scope-entry-list',['scope_id' =>$scope->id])->withErrors(['errors' =>"Input domains have incorrect format:".$error]);
 	}
 
 

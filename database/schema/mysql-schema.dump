@@ -57,29 +57,6 @@ CREATE TABLE `failed_jobs` (
   UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `findings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `findings` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `type` enum('nuclei','dirsearch') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'nuclei',
-  `severity` enum('info','low','medium','high','critical') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'high',
-  `report` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `resource_id` bigint(20) unsigned NOT NULL,
-  `scope_entry_id` bigint(20) unsigned NOT NULL,
-  `scope_id` bigint(20) unsigned NOT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `findings_resource_id_foreign` (`resource_id`),
-  KEY `findings_scope_entry_id_foreign` (`scope_entry_id`),
-  KEY `findings_scope_id_foreign` (`scope_id`),
-  FULLTEXT KEY `findings_report_fulltext` (`report`),
-  CONSTRAINT `findings_resource_id_foreign` FOREIGN KEY (`resource_id`) REFERENCES `resources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `findings_scope_entry_id_foreign` FOREIGN KEY (`scope_entry_id`) REFERENCES `scope_entries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `findings_scope_id_foreign` FOREIGN KEY (`scope_id`) REFERENCES `scopes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `jobs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -103,6 +80,30 @@ CREATE TABLE `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `outputs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `outputs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `type` enum('nuclei','dirsearch') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'nuclei',
+  `severity` enum('info','low','medium','high','critical') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'high',
+  `report` text COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `resource_id` bigint(20) unsigned NOT NULL,
+  `scope_entry_id` bigint(20) unsigned NOT NULL,
+  `scope_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `service_id` bigint(20) unsigned NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `findings_resource_id_foreign` (`resource_id`),
+  KEY `findings_scope_entry_id_foreign` (`scope_entry_id`),
+  KEY `findings_scope_id_foreign` (`scope_id`),
+  FULLTEXT KEY `findings_report_fulltext` (`report`),
+  CONSTRAINT `findings_resource_id_foreign` FOREIGN KEY (`resource_id`) REFERENCES `resources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `findings_scope_entry_id_foreign` FOREIGN KEY (`scope_entry_id`) REFERENCES `scope_entries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `findings_scope_id_foreign` FOREIGN KEY (`scope_id`) REFERENCES `scopes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `password_resets`;
@@ -148,10 +149,13 @@ CREATE TABLE `queues` (
   `status` enum('todo','queued','running','done') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'todo',
   `scope_id` bigint(20) unsigned NOT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
+  `scanner_entry_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `queues_user_id_foreign` (`user_id`),
   KEY `queues_object_id_object_type_index` (`object_id`,`object_type`),
   KEY `queues_scope_id_foreign` (`scope_id`),
+  KEY `queues_scanner_entry_id_foreign` (`scanner_entry_id`),
+  CONSTRAINT `queues_scanner_entry_id_foreign` FOREIGN KEY (`scanner_entry_id`) REFERENCES `scanner_entries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `queues_scope_id_foreign` FOREIGN KEY (`scope_id`) REFERENCES `scopes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `queues_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -216,6 +220,35 @@ CREATE TABLE `responses` (
   CONSTRAINT `screenshots_service_id_foreign` FOREIGN KEY (`service_id`) REFERENCES `services` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `scanner_entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scanner_entries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `arguments` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `scanner_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `scanner_entries_scanner_id_foreign` (`scanner_id`),
+  CONSTRAINT `scanner_entries_scanner_id_foreign` FOREIGN KEY (`scanner_id`) REFERENCES `scanners` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `scanners`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scanners` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `type` enum('discovery','resource','service','output') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `class` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `has_arguments` tinyint(1) NOT NULL DEFAULT 0,
+  `description` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `schedules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -223,15 +256,17 @@ CREATE TABLE `schedules` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `scope_id` bigint(20) unsigned NOT NULL,
   `user_id` bigint(20) unsigned NOT NULL,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `frequency` enum('daily','weekly','monthly','quarterly') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'weekly',
   `deleted_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `template_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `schedules_scope_id_foreign` (`scope_id`),
   KEY `schedules_user_id_foreign` (`user_id`),
+  KEY `schedules_template_id_foreign` (`template_id`),
   CONSTRAINT `schedules_scope_id_foreign` FOREIGN KEY (`scope_id`) REFERENCES `scopes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `schedules_template_id_foreign` FOREIGN KEY (`template_id`) REFERENCES `templates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `schedules_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -249,6 +284,22 @@ CREATE TABLE `scope_entries` (
   PRIMARY KEY (`id`),
   KEY `scope_entries_scope_id_foreign` (`scope_id`),
   CONSTRAINT `scope_entries_scope_id_foreign` FOREIGN KEY (`scope_id`) REFERENCES `scopes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `scope_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `scope_templates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `template_id` bigint(20) unsigned NOT NULL,
+  `scope_id` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `scope_templates_template_id_foreign` (`template_id`),
+  KEY `scope_templates_scope_id_foreign` (`scope_id`),
+  CONSTRAINT `scope_templates_scope_id_foreign` FOREIGN KEY (`scope_id`) REFERENCES `scopes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `scope_templates_template_id_foreign` FOREIGN KEY (`template_id`) REFERENCES `templates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `scopes`;
@@ -303,6 +354,34 @@ CREATE TABLE `sessions` (
   PRIMARY KEY (`id`),
   KEY `sessions_user_id_index` (`user_id`),
   KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `template_entries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `template_entries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `scanner_entry_id` bigint(20) unsigned NOT NULL,
+  `template_id` bigint(20) unsigned NOT NULL,
+  `order` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `template_entries_scanner_entry_id_foreign` (`scanner_entry_id`),
+  KEY `template_entries_template_id_foreign` (`template_id`),
+  CONSTRAINT `template_entries_scanner_entry_id_foreign` FOREIGN KEY (`scanner_entry_id`) REFERENCES `scanner_entries` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `template_entries_template_id_foreign` FOREIGN KEY (`template_id`) REFERENCES `templates` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `templates` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users`;
@@ -394,3 +473,15 @@ INSERT INTO `migrations` VALUES (58,'2022_09_24_114419_api_key',30);
 INSERT INTO `migrations` VALUES (59,'2022_10_15_191102_drop_unused',31);
 INSERT INTO `migrations` VALUES (60,'2022_10_15_192157_create_findings_table',32);
 INSERT INTO `migrations` VALUES (61,'2022_10_16_100134_update_findings',33);
+INSERT INTO `migrations` VALUES (62,'2022_11_08_111801_create_scanners_table',34);
+INSERT INTO `migrations` VALUES (63,'2022_11_08_111802_create_scanner_entries_table',34);
+INSERT INTO `migrations` VALUES (64,'2022_11_08_111832_create_templates_table',34);
+INSERT INTO `migrations` VALUES (65,'2022_11_08_111853_create_template_entries_table',34);
+INSERT INTO `migrations` VALUES (66,'2022_11_08_111942_create_scope_templates_table',34);
+INSERT INTO `migrations` VALUES (67,'2022_11_08_153531_findings_to_output',35);
+INSERT INTO `migrations` VALUES (68,'2022_11_08_153558_scanners_has_args',35);
+INSERT INTO `migrations` VALUES (70,'2022_11_10_210345_update_templates',36);
+INSERT INTO `migrations` VALUES (71,'2022_11_10_211444_update_queue',37);
+INSERT INTO `migrations` VALUES (72,'2022_11_11_154045_update_scanners',38);
+INSERT INTO `migrations` VALUES (74,'2022_11_13_125913_update_output',39);
+INSERT INTO `migrations` VALUES (75,'2022_11_14_210745_update_schedules',40);
