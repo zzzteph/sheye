@@ -13,7 +13,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "league/flysystem": "^3.0",
-        "league/flysystem-aws-s3-v3": "^3.0",
+        "league/flysystem-aws-s3-v3": "^3.0"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^1.0",
