@@ -10,23 +10,19 @@ services:
     image: sheye
     container_name: sheye-app
     restart: unless-stopped
-    working_dir: /var/www/sheye
-    volumes:
-      - ./:/var/www/sheye
+    working_dir: /var/www/html
     networks:
       - sheye-network
 
   db:
-    image: mysql:5.7
+    image: mariadb:10.2
     container_name: sheye-db
-    restart: unless-stopped
+    restart: on-failure
     environment:
-      MYSQL_DATABASE: sheye
-      MYSQL_ROOT_PASSWORD: sheye
-      MYSQL_PASSWORD: sheye
-      MYSQL_USER: sheye
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
+      MYSQL_DATABASE: scanner
+      MYSQL_ROOT_PASSWORD: scanner
+      MYSQL_PASSWORD: scanner
+      MYSQL_USER: scanner
     volumes:
       - dbdata:/var/lib/mysql
     networks:
@@ -39,8 +35,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./:/var/www/sheye
-      - ./docker-compose/nginx:/etc/nginx/conf.d/
+      - ./nginx:/etc/nginx/conf.d/
     networks:
       - sheye-network
 
