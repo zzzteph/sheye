@@ -1,2 +1,2 @@
 #!/bin/bash
-nginx & docker-php-entrypoint php-fpm 
+sh workers.sh & nginx & docker-php-entrypoint php-fpm 
