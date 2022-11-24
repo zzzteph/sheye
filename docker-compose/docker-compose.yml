@@ -11,6 +11,10 @@ services:
     container_name: sheye-app
     restart: unless-stopped
     working_dir: /var/www/html
+    volumes:
+      - storage:/var/www/html/storage
+    ports:
+      - 80:80
     networks:
       - sheye-network
 
@@ -28,20 +32,11 @@ services:
     networks:
       - sheye-network
 
-  nginx:
-    image: nginx:alpine
-    container_name: sheye-nginx
-    restart: unless-stopped
-    ports:
-      - 80:80
-    volumes:
-      - ./nginx:/etc/nginx/conf.d/
-    networks:
-      - sheye-network
-
 networks:
   sheye-network:
     driver: bridge
 volumes:
   dbdata:
+    driver: local
+  storage:
     driver: local
