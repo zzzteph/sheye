@@ -9,18 +9,21 @@ do
 
 
  queues=$(ps aux| grep -v grep| grep "queue:work database --queue=discovery" | wc -l);
-  if [ "$queues" -lt "5" ]; then
+  if [ "$queues" -lt "3" ]; then
 
    php artisan queue:work database --queue=discovery --sleep=3 > discovery.log &
   fi
  queues=$(ps aux| grep -v grep| grep "queue:work database --queue=resource" | wc -l);
-  if [ "$queues" -lt "20" ]; then
+  if [ "$queues" -lt "5" ]; then
 
    php artisan queue:work database --queue=resource --sleep=3 > resource.log &
   fi
 
 
 	php artisan schedule:run
+
+
+
 
   sleep 60
 done

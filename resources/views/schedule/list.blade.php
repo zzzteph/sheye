@@ -24,7 +24,7 @@
 		  <div class="field">
 		  <div class="control">
 			<div class="select is-fullwidth">
-			  <select name="frequency" placeholder="Your email">
+			  <select name="frequency" >
 			  <option value="" disabled selected>Select frequency</option>
 				<option value="daily">daily</option>
 				<option value="weekly">weekly</option>
@@ -36,6 +36,29 @@
 			</div>
 			</div>
 		  </div>
+		  
+		  
+		  <div class="field">
+		  <div class="control">
+			<div class="select is-fullwidth">
+			  <select name="template" >
+			  <option value="" disabled selected>Select template</option>
+			@foreach ($templates as $template)
+			 
+			 <option value="{{$template->id}}">{{$template->name}}</option>
+			 
+			 @endforeach
+				
+
+			  </select>
+			</div>
+			</div>
+		  </div>
+		  
+		  
+		  
+		  
+		  
 		  
 		  <div class="field">
 		  <div class="control">
@@ -58,6 +81,7 @@
             <tr>
                <th>Projects</th>
                <th>Time</th>
+			   <th>Template</th>
 			   <th></th>
 			   <th></th>  
             </tr>
@@ -75,7 +99,9 @@
                  {{ $schedule->frequency }}
                </td>
 
-
+               <td>
+                 {{ $schedule->template->name }}
+               </td>
 
 
                <td>

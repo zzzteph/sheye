@@ -9,6 +9,8 @@
     <script src="{{ asset('assets/js/jquery-3.6.0.js')}}"></script>
 	<script src="{{ asset('assets/js/vue.js')}}"></script>
 	<script src="{{ asset('assets/js/axios.min.js')}}"></script>
+	<script src="{{ asset('assets/js/selectize.min.js')}}"></script>
+    <script src="{{ asset('assets/css/selectize.min.css')}}"></script>
 	<script src="https://kit.fontawesome.com/487ccd8ae9.js" crossorigin="anonymous"></script>
 
 
@@ -92,6 +94,59 @@
 		        <a class="navbar-item" href="{{route('schedule-list')}}">
           Monitor
         </a>
+		
+		<div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Templates
+        </a>
+
+        <div class="navbar-dropdown">
+          <a class="navbar-item" href="{{route('templates-list')}}">
+            List
+          </a>
+          <a class="navbar-item" href="{{route('templates-new')}}">
+            Add
+          </a>
+        </div>
+      </div>
+
+
+
+
+
+
+		      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Scanners
+        </a>
+
+        <div class="navbar-dropdown">
+
+          <a class="navbar-item" href="{{route('scanners-types')}}">
+            Types
+          </a>
+          <a class="navbar-item" href="{{route('scanners-list')}}">
+            List
+          </a>
+          <a class="navbar-item" href="{{route('scanners-new')}}">
+            Add
+          </a>
+
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+		
     </div>
 
     <div class="navbar-end is-size-5">

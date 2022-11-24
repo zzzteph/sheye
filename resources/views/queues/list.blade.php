@@ -33,48 +33,7 @@
 		  
 				<td>
 				
-				
-					@if($queue->type=='asset')
-						
-					<a href="https://github.com/tomnomnom/assetfinder" target="_blank">assetfinder</a>
-					
-					@elseif($queue->type=='subfinder')
-					
-				
-					
-					<a href="https://github.com/projectdiscovery/subfinder" target="_blank">subfinder</a>
-					
-					
-					@elseif($queue->type=='nmap')
-					
-					Network services
-					
-					
-					@elseif($queue->type=='amass')
-					
-					<a href="https://github.com/OWASP/Amass" target="_blank">amass</a>
-					
-					
-					@elseif($queue->type=='wayback')
-					
-					<a href="https://github.com/lc/gau" target="_blank">gau</a>
-					
-					
-					@elseif($queue->type=='dnsb')
-					
-					<a href="https://github.com/zzzteph/substats" target="_blank">dnsx brute</a>
-
-					
-					@elseif($queue->type=='analyze')
-					
-					Screenshots and sources
-
-										@elseif($queue->type=='nuclei')
-					<a href="https://github.com/projectdiscovery/nuclei" target="_blank">Nuclei</a>
-					
-
-					 @endif
-					 
+				{{$queue->scanner_entry->name}}
 				
 				</td>
 

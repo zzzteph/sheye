@@ -17,6 +17,19 @@
 	    <p class="help">Each domain should start from new line.</p>
 
 	</div>
+<div class="field">
+    <div class="control">
+      <div class="select">
+        <select name="template">
+            @foreach ($templates as $template)
+		
+                <option value="{{$template->id}}">{{$template->name}}</option>
+            @endforeach
+        </select>
+      </div>
+    </div>
+	 <p class="help">Default workflow.</p>
+ </div>
 
 
 	<div class="field">
