@@ -12,4 +12,4 @@ mysql -e "CREATE USER 'scanner'@'localhost' IDENTIFIED BY 'scanner'";
 mysql -e "GRANT ALL PRIVILEGES ON scanner . * TO 'scanner'@'localhost'";
 mysql -e "FLUSH PRIVILEGES";
 cd /var/www/html&& php artisan migrate 
-nginx & docker-php-entrypoint php-fpm &
+nginx & docker-php-entrypoint php-fpm 
