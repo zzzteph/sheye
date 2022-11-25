@@ -11,10 +11,10 @@ services:
     container_name: sheye-app
     restart: unless-stopped
     working_dir: /var/www/html
-    volumes:
-      - storage:/var/www/html/storage
     ports:
       - 80:80
+    volumes:
+      - storage:/var/www/html/storage
     networks:
       - sheye-network
 
