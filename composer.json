@@ -12,11 +12,7 @@
         "jenssegers/agent": "^2.6",
         "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.11",
-        "laravel/tinker": "^2.5",
-        "league/flysystem": "^3.0",
-        "league/flysystem-aws-s3-v3": "^3.0",
-        "symfony/http-client": "^6.1",
-        "symfony/mailgun-mailer": "^6.1"
+        "laravel/tinker": "^2.5"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^1.0",
