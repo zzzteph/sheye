@@ -60,7 +60,7 @@
         </div>
       </div>
       <div class="column is-6-tablet is-offset-1-desktop">
-	  <a href="{{$screenshot->link }}" target="_blank"><img src="">
+	  <a href="{{$screenshot->link }}" target="_blank">
         <img class="image is-fullwidth" src="{{$screenshot->screen_url }}" alt="">
 		</a>
       </div>

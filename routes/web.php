@@ -86,6 +86,7 @@ Route::delete('/scan/{scope_id}',[ScansController::class, 'scope_scan_stop'])->n
 
 Route::get('/findings/{scope_id}/{severity}',[FindingsController::class, 'scope_list'])->name('scope-findings');
 Route::get('/findings/{scope_id}/{scope_entry_id}/{severity}',[FindingsController::class, 'scope_entry_list'])->name('scope-entry-findings');
+ Route::get('/findings/{id}',[FindingsController::class, 'view'])->name('finding-view');
  
 Route::get('/jobs/{type}',[JobsController::class, 'monitor'])->name('view-jobs');
 

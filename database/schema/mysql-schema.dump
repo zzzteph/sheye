@@ -225,7 +225,7 @@ DROP TABLE IF EXISTS `scanner_entries`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `scanner_entries` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `arguments` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `arguments` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `scanner_id` bigint(20) unsigned NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -485,3 +485,4 @@ INSERT INTO `migrations` VALUES (71,'2022_11_10_211444_update_queue',37);
 INSERT INTO `migrations` VALUES (72,'2022_11_11_154045_update_scanners',38);
 INSERT INTO `migrations` VALUES (74,'2022_11_13_125913_update_output',39);
 INSERT INTO `migrations` VALUES (75,'2022_11_14_210745_update_schedules',40);
+INSERT INTO `migrations` VALUES (76,'2022_11_26_181842_update_scanners_arguments_length',41);

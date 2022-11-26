@@ -52,35 +52,9 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
     }
 
 
-	public function uploadToS3($folder,$name,$response)
-	{
-		$main_image=storage_path('app/public')."/".$folder."/".$name.".jpg";
-		$preview_image=storage_path('app/public')."/".$folder."/preview_".$name.".jpg";
-		
-		if(file_exists($main_image))
-		{
-			$path=Storage::disk('s3')->putFile($folder,$main_image,'public');
-			$response->path=Storage::disk('s3')->url($path);
-			Storage::disk('public')->delete($folder."/".$name.".jpg");
-		}
-		if(file_exists($preview_image))
-		{
-			$path=Storage::disk('s3')->putFile($folder,$preview_image,'public');
-			$response->preview=Storage::disk('s3')->url($path);
-			Storage::disk('public')->delete($folder."/preview_".$name.".jpg");
-		}
-		$response->save();
-	}
-	
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
+
     public function handle()
     {
-		$needUpload=env('UPLOAD_TO_S3', false);
-		
 		
 		
 		$service= Service::find($this->entry->object_id);
@@ -349,13 +323,6 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 	
 					
 
-				if($needUpload==true)
-				{
-					$this->uploadToS3($scope_entry->id,$rnd,$resp);
-				}
-				
-				
-				//remove source of the file
 				Storage::disk('public')->delete($scope_entry->id."/".$rnd.".txt");
 				
 			}

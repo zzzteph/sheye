@@ -27,6 +27,7 @@ class ScansController extends Controller
  	public function scope_scan_launch($scope_id)
 	{
 		$scope=Scope::where('user_id', Auth::id())->where('id',$scope_id)->firstOrFail();
+		
 		LaunchScanJob::dispatch($scope);
 		return back();	
 	}

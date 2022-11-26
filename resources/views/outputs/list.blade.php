@@ -58,7 +58,8 @@
         </div>
       </div>
       <div class="column is-6-tablet is-offset-1-desktop">
-		
+			  <p><a href="{{route('finding-view',
+		  ['scope_id'=>$finding->id])}}">View</a></p>
 			{!! $finding->fine_report !!}
 			
 		

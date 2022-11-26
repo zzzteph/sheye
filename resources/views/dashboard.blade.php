@@ -23,16 +23,16 @@
                <tbody>
                   <tr>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'critical','type'=>'nuclei'])}}"> {{ $scope->outputs()->where('severity','critical')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'critical'])}}"> {{ $scope->outputs()->where('severity','critical')->count() }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'high','type'=>'nuclei'])}}"> {{ $scope->outputs()->where('severity','high')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'high'])}}"> {{ $scope->outputs()->where('severity','high')->count() }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'medium','type'=>'nuclei'])}}"> {{ $scope->outputs()->where('severity','medium')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'medium'])}}"> {{ $scope->outputs()->where('severity','medium')->count() }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'medium','type'=>'nuclei'])}}"> {{ $scope->outputs()->where('severity','medium')->where('severity','high')->where('severity','critical')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'low'])}}"> {{ $scope->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count() }}</a>
                      </td>
                   </tr>
                </tbody>
@@ -82,16 +82,18 @@
                   </tr>
                   @else
                   <tr>
-                     <td>Tasks</td>
-                     <td></td>
-                     <td></td>
+                     <td>&nbsp;</td>
+                     <td>&nbsp;</td>
+                     <td>&nbsp;</td>
                   </tr>
                   @endif
                </tbody>
             </table>
-            <form method="POST" action="{{route('scope-scan-launch',['scope_id' => $scope->id])}}">
-               <div class="field has-addons ">
+            <form method="POST" action="{{route('templates-launch')}}">
+               
+			   <div class="field has-addons ">
                   @csrf
+					<input type="hidden" name="scope" value="{{$scope->id}}">
                   <div class="control is-expanded">
                      <div class="select is-expanded is-fullwidth is-small">
                         <select name="template" >
