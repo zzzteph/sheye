@@ -19,6 +19,14 @@ do
    php artisan queue:work database --queue=resource --sleep=3 > resource.log &
   fi
 
+ queues=$(ps aux| grep -v grep| grep "queue:work database --queue=analyze" | wc -l);
+  if [ "$queues" -lt "2" ]; then
+
+   php artisan queue:work database --queue=analyze --sleep=3 > resource.log &
+  fi
+
+
+
 
 	php artisan schedule:run
 
