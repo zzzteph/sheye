@@ -28,7 +28,7 @@ class ErrorJobsClear extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Remove jobs that stuck in queue';
 
     /**
      * Create a new command instance.

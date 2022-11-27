@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('push:queue')->withoutOverlapping();
 		$schedule->command('wipe:queue')->hourly();
 		$schedule->command('wipe:done')->hourly();
+		$schedule->command('wipe:storage')->hourly();
 		$schedule->command('scheduler:run daily')->daily();
 		$schedule->command('scheduler:run weekly')->weekly();
 		$schedule->command('scheduler:run monthly')->monthly();
