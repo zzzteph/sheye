@@ -1,7 +1,7 @@
 
 
 <p align="center">
-  <img src="https://github.com/zzzteph/sheye/blob/main/public/shrewdeye.png?raw=true"  height="350">
+  <img src="https://github.com/zzzteph/sheye/blob/main/public/logo.png?raw=true"  height="350">
 </p>
 
 
