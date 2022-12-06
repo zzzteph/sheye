@@ -2,7 +2,7 @@
 <h1 class="title">Dashboard</h1>
 {{ $scopes->links() }}
 @foreach ($scopes as $scope)
-@if($loop->iteration%4==0 && !$loop->first)
+@if(($loop->iteration-1)%3==0 && !$loop->first)
 </div>
 <div class="columns is-multiline">
    @endif
