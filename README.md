@@ -14,8 +14,26 @@
 
 # Setup
 
+## Docker
 
-Please, take a look at [Wiki](https://github.com/zzzteph/sheye/wiki/Setup) for setup guide.
+First you need to install docker on your system. After that navigate ```docker-compose``` folder and run ```run.sh``` or type next commands
+
+```
+docker-compose up -d 
+sleep 30
+docker-compose exec app php artisan key:generate
+docker-compose exec app php artisan migrate
+docker-compose exec app php artisan db:seed --class=ScannerSeeder
+docker-compose exec app php artisan db:seed --class=ScanEntrySeeder
+docker-compose exec app php artisan db:seed --class=TemplateSeeder
+docker-compose exec app php artisan add:user admin admin
+
+```
+
+
+## Manual setup 
+
+Please, take a look at [Wiki](https://github.com/zzzteph/sheye/wiki/Setup) for manual setup guide.
 
 
 
