@@ -65,7 +65,7 @@ class ScopeEntry extends Model
     }
 	public function getScreenshotsCountAttribute()
     {
-		return $this->responses()->where('size','>',10592)->count();
+		return $this->responses()->where('size','>',0)->count();
     }
 	public function getNewResourceCountAttribute()
     {
