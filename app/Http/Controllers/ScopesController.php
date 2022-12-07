@@ -189,6 +189,7 @@ class ScopesController extends Controller
 
 	function check_if_domain_is_ip_mask($domain)
 	{
+		$domain=trim($domain);
 		    $parts = explode('/', $domain);
 			if(count($parts) != 2) {
 				return false;
