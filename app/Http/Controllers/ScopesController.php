@@ -19,7 +19,7 @@ class ScopesController extends Controller
      
    public function index()
  { 
-    return view('dashboard',['templates'=>Template::all(),'scopes' =>  Scope::where('user_id', Auth::id())->orderBy('id', 'desc')->paginate(10)]);
+    return view('dashboard',['templates'=>Template::all(),'scopes' =>  Scope::where('user_id', Auth::id())->orderBy('id', 'desc')->paginate(12)]);
  }
  
  	public function new()
