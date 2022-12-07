@@ -23,8 +23,8 @@ use Symfony\Component\Process\Process;
 class AnalyzeService implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-	public $timeout = 300;
-	public $uniqueFor = 300;
+	public $timeout = 120;
+	public $uniqueFor = 120;
     /**
      * Create a new job instance.
      *
@@ -38,12 +38,12 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 	public $httpx;
     public function __construct(Queue $entry)
     {
-		$this->onQueue('analyze');
+		$this->onQueue('resource');
 		$this->entry=$entry;
 		$this->scanner_path=base_path()."/scanners/screenshot/target/";
 		$this->scanner=$this->scanner_path."screenshot-1.0.jar";
 		$this->httpx=base_path()."/scanners/httpx";
-		$this->time_limit=240;
+		$this->time_limit=60;
     }
 
 	public function uniqueId()

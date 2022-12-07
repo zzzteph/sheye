@@ -11,7 +11,7 @@ use App\Models\Template;
 use App\Models\TemplateEntry;
 use App\Models\Scanner;
 use App\Models\ScannerEntry;
-
+use App\Jobs\IPParseJob;
 use Illuminate\Support\Facades\Bus;
 class ScopeEntryNotification implements ShouldQueue
 {
@@ -56,5 +56,16 @@ class ScopeEntryNotification implements ShouldQueue
 
  
 		}		
+		
+		if($event->entry->type=="ip_list")
+		{
+			
+			IPParseJob::dispatch($event->entry);
+
+ 
+		}	
+		
+		
+		
     }
 }

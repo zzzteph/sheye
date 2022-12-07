@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Bus;
-use App\Jobs\WipeQueueJob;
 class ScopesController extends Controller
 {
      
@@ -82,7 +81,7 @@ class ScopesController extends Controller
 		
 		
 		
-		return redirect()->route('scopes-edit',['id' =>$scope->id]);
+			return redirect()->route('scope-entry-list',['scope_id' =>$scope->id]);
 	}
 
 
@@ -95,17 +94,25 @@ class ScopesController extends Controller
 		]);
 		
 		$domains=explode(PHP_EOL,$request->input('domains'));
-		$error=$this->validate_domain_list($domains);
-		if($error!==FALSE)
+		foreach($domains as $domain)
 		{
-			$msg="Input domains have incorrect format:".$error;
-			return back()->withErrors(['errors' => $msg]);
+			if($this->is_error_in_domain($domain)!==FALSE && $this->check_if_domain_is_ip_mask($domain)===FALSE)
+			{
+					return back()->withErrors(['errors' => "Input domains or ip lists have incorrect format"]);
+			}
 		}
+
+		
+		
 		
 
 		foreach($domains as $domain)
 		{
 			$domain=trim($domain);
+			if($this->check_if_domain_is_ip_mask($domain)==true)continue;
+			if($this->is_error_in_domain($domain)!=FALSE)continue;
+			
+			
 			if(ScopeEntry::where("scope_id",$scope_id)->where("source",trim($domain))->first()!=null)continue;
 			$tmp=new ScopeEntry;
 			$tmp->type="domain";
@@ -118,13 +125,32 @@ class ScopesController extends Controller
 			 
 			 
 		}
-		return redirect()->route('scopes-edit',['id' =>$scope->id]);
+		
+		
+		foreach($domains as $domain)
+		{
+			$domain=trim($domain);
+			if($this->check_if_domain_is_ip_mask($domain)===false)continue;
+			if(ScopeEntry::where("scope_id",$scope_id)->where("source",trim($domain))->first()!=null)continue;
+			$tmp=new ScopeEntry;
+			$tmp->type="ip_list";
+			
+			$tmp->source=trim(strtolower($domain));
+			$tmp->scope_id=$scope->id;
+			$tmp->save();
+ 
+		}
+		
+		
+		
+	return redirect()->route('scope-entry-list',['scope_id' =>$scope->id]);
 	}
 
 
 
- 	function validate_domain($domain)
+ 	function is_error_in_domain($domain)
 	{
+	
 		$domain=trim($domain);
 		if(str_starts_with($domain, "*.")!==FALSE)
 		{
@@ -160,12 +186,34 @@ class ScopesController extends Controller
 	}
 
 
+
+	function check_if_domain_is_ip_mask($domain)
+	{
+		    $parts = explode('/', $domain);
+			if(count($parts) != 2) {
+				return false;
+			}
+
+			$ip = $parts[0];
+			$netmask = intval($parts[1]);
+
+			if($netmask < 0) {
+				return false;
+			}
+
+			if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+				return $netmask <= 32;
+			}
+			return false;
+	}
+
 	function validate_domain_list($domains)
 	{
 		
 		$error=FALSE;
 		foreach($domains as $domain)
 		{
+			if($this->check_if_domain_is_ip_mask($domain))continue;
 			$domain=trim($domain);
 			if(str_starts_with($domain, "*.")!==FALSE)
 			{
@@ -219,18 +267,10 @@ class ScopesController extends Controller
 		
 		$domains=explode(PHP_EOL,$request->input('domains'));
 		$error=$this->validate_domain_list($domains);
-		
-
-		
-		
-		
-		
-		
-		
 		$domainsCount=0;
 		foreach($domains as $domain)
 		{
-			if($this->validate_domain($domain)===FALSE)
+			if($this->is_error_in_domain($domain)===FALSE || $this->check_if_domain_is_ip_mask($domain)!==FALSE)
 			{
 				$domainsCount++;
 			}
@@ -238,7 +278,7 @@ class ScopesController extends Controller
 		
 		if($domainsCount==0)
 		{
-			$msg="Input domains have incorrect format";
+			$msg="Input domains or ip lists have incorrect format";
 			return back()->withErrors(['errors' => $msg]);
 		}
 
@@ -257,18 +297,30 @@ class ScopesController extends Controller
 		
 		foreach($domains as $domain)
 		{
-			if($this->validate_domain($domain)!=FALSE)continue;
+			if($this->check_if_domain_is_ip_mask($domain)==true)continue;
+			if($this->is_error_in_domain($domain)!=FALSE)continue;
 			$domain=trim($domain);
 			$tmp=new ScopeEntry;
 			$tmp->type="domain";
 			if(str_starts_with($domain, "*.")!==FALSE)$tmp->type="domain_list";
 			$tmp->source=trim(strtolower($domain));
 			$tmp->scope_id=$scope->id;
-			$tmp->save();
-			 		
-			 
-			 
+			$tmp->save();	 
 		}
+		
+		foreach($domains as $domain)
+		{
+			if($this->check_if_domain_is_ip_mask($domain)==false)continue;
+			$domain=trim($domain);
+			$tmp=new ScopeEntry;
+			$tmp->type="ip_list";
+			$tmp->source=trim(strtolower($domain));
+			$tmp->scope_id=$scope->id;
+			$tmp->save();	 
+		}
+		
+		
+		
 		if($error==FALSE)
 			return redirect()->route('scope-entry-list',['scope_id' =>$scope->id]);
 		else

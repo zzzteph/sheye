@@ -37,7 +37,7 @@ class Scope extends Model
     }
 		public function screenshots()
     {
-        return $this->responses()->where('size','>',0);
+        return $this->responses()->where('size','>',10592);
     }
 	
 		public function scope_entries()
@@ -60,7 +60,7 @@ class Scope extends Model
 	
 	public function getScreenshotsCountAttribute()
     {
-		return $this->responses()->where('size','>',0)->count();
+		return $this->responses()->where('size','>',10592)->count();
     }
 	
 
