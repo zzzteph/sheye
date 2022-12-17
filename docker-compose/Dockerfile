@@ -20,7 +20,7 @@ RUN apk -U upgrade --no-cache \
 RUN docker-php-ext-install mysqli pdo_mysql exif pcntl bcmath 
 
 
-RUN git clone https://github.com/zzzteph/sheye /var/www/html
+COPY . /var/www/html/
 RUN mkdir /var/www/html/scanners/amass_linux
 COPY --from=build-go /go/bin/amass /var/www/html/scanners/amass_linux/amass
 COPY --from=build-go /go/bin/subfinder /var/www/html/scanners/subfinder

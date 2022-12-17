@@ -5,8 +5,8 @@ services:
       args:
         user: sheye
         uid: 1000
-      context: ./
-      dockerfile: Dockerfile
+      context: ./..
+      dockerfile: ./docker-compose/Dockerfile
     image: sheye
     container_name: sheye-app
     restart: unless-stopped
