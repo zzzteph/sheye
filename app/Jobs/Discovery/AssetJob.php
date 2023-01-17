@@ -127,7 +127,7 @@ class AssetJob implements ShouldQueue, ShouldBeUnique
 		{
 			$line=trim($line);
 			if(in_array($line,$uniq_lines))continue;
-			if(strpos($line,$this->domain)!==FALSE &&  str_ends_with($line,$this->domain) && $this->is_valid_domain_name($line))
+			if((strpos($line,$this->domain)!==FALSE &&  str_ends_with($line,".".$this->domain) && $this->is_valid_domain_name($line))  || $line===$this->domain)
 			{
 				if(Resource::where('scope_entry_id',$this->scope_entry->id)->where('name',$line)->first()==null)
 				{
@@ -137,12 +137,28 @@ class AssetJob implements ShouldQueue, ShouldBeUnique
 			}
 			
 		}
-
+		//making uniq list in memmory (FT: reduce number of select requests);
+		$list_of_sources=array();
+		foreach(Resource::where('scope_entry_id',$this->scope_entry->id)->get() as $rentry)
+		{
+				$list_of_sources[trim($rentry->name)]=1;
+		}
+	
 
 		foreach($uniq_lines as $line)
 		{
 			$line=trim($line);
-			if(strpos($line,$this->domain)!==FALSE &&  str_ends_with($line,$this->domain) && $this->is_valid_domain_name($line))
+			
+			
+			if(isset($list_of_sources[$line]))
+			{
+				unset($list_of_sources[$line]);
+				continue;
+			}
+			
+			
+			
+			if((strpos($line,$this->domain)!==FALSE &&  str_ends_with($line,".".$this->domain) && $this->is_valid_domain_name($line))  || $line===$this->domain)
 			{
 				if($this->is_valid($line))
 				{
