@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 class Scope extends Model
 {
     use HasFactory;
@@ -27,13 +28,13 @@ class Scope extends Model
     }
 	public function resources()
     {
-        return $this->hasManyThrough( Resource::class,ScopeEntry::class);
+        return $this->hasMany( Resource::class);
     }
 	
 		public function responses()
     {
 		
-		return $this->hasManyThrough( Response::class,ScopeEntry::class);
+		return $this->hasMany( Response::class);
     }
 		public function screenshots()
     {
@@ -58,17 +59,162 @@ class Scope extends Model
         return $this->hasMany(Schedule::class);
     }
 	
+	public function getCriticalFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_'.$this->id."_critical_findings", $cache_timeout, function () {
+				return $scope->outputs()->where('severity','critical')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $scope->outputs()->where('severity','critical')->count();
+		}
+		
+    }
+	
+		public function getHighFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_'.$this->id."_high_findings", $cache_timeout, function () {
+				return $scope->outputs()->where('severity','high')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $scope->outputs()->where('severity','high')->count();
+		}
+		
+    }
+	
+	
+			public function getMediumFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_'.$this->id."_medium_findings", $cache_timeout, function () {
+				return $scope->outputs()->where('severity','medium')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $scope->outputs()->where('severity','medium')->count();
+		}
+		
+    }
+	
+				public function getLowFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_'.$this->id."_low_findings", $cache_timeout, function () {
+				return $scope->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $scope->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
+		}
+		
+    }
+	
+	
+	
+	
+	
 	public function getScreenshotsCountAttribute()
     {
-		return $this->responses()->where('size','>',10592)->count();
+			if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_'.$this->id."_screenshots", $cache_timeout, function () {
+				return $this->responses()->where('size','>',10592)->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->responses()->where('size','>',10592)->count();
+		}
+		
+		
+		
+		
     }
 	
 
-		public function getProgressAttribute()
+	public function getProgressAttribute()
     {
 
-		return $this->queues()->where('status','!=', 'done')->count();
+		if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=60;
+			$count = Cache::remember('scope_'.$this->id."_progress", $cache_timeout, function () {
+				return $this->queues()->where('status','!=', 'done')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->queues()->where('status','!=', 'done')->count();
+		}
+
+
+		
 
 		
     }
+	
+	
+	public function getScopeEntriesCountAttribute()
+    {
+		
+
+		if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_'.$this->id."_scope_entries", $cache_timeout, function () {
+				return $this->scope_entries()->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->scope_entries()->count();
+		}
+		
+    }
+	
+		public function getResourcesCountAttribute()
+    {
+		if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_'.$this->id."_resources", $cache_timeout, function () {
+				return $this->resources()->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->resources()->count();
+		}
+		
+    }
+	
+	
+	
+	
+	
+	
 }

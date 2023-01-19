@@ -32,7 +32,7 @@ use App\Jobs\Resource\AnalyzeService;
 use App\Jobs\Resource\NucleiCriticalScan;
 use App\Jobs\Resource\NucleiHighScan;
 use App\Jobs\Resource\NucleiMediumScan;
-
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Bus;
 class Pusher extends Command
 {
@@ -170,23 +170,27 @@ class Pusher extends Command
 		$users=array();
 		$max=0;
 		$users=User::all();
+		Log::debug('Starting collection users');
+		Log::debug('MAX_TASKS :'.env('MAX_TASKS'));
 		foreach ($users as $user) //get users before running
 		{
-
+			
 			$user_package[$user->id]=env('MAX_TASKS')-$user->count_active_tasks;	
+			Log::debug('USER:'.$user->id." has active tasks ".$user->count_active_tasks);
+			Log::debug('USER:'.$user->id." has free tasks ".$user_package[$user->id]);
 
 			if($max<$user_package[$user->id])$max=$user_package[$user->id];
-			echo "USER:".$user->id.":".$user_package[$user->id].PHP_EOL;
 			
 		}
-		echo "Maximum:$max".PHP_EOL;
+		Log::debug("Maximum tasks to scan:".$max);
 		
 		for($i=0;$i<$max;$i++)
 			foreach ($users as $user) 
 			{
 				if($user_package[$user->id]<=0)continue;
-				foreach($user->command_queues()->where('status','todo')->get() as $queue)
+				foreach($user->command_queues()->where('status','todo')->limit(env('MAX_TASKS'))->get() as $queue)
 				{
+					Log::debug("Command-queue task:".$queue->id." with type ".$queue->type." (".$user->id.")");
 					$queue->status="queued";
 					$queue->save();
 					switch($queue->type)
@@ -200,14 +204,14 @@ class Pusher extends Command
 						case "dirsearch":$this->dirsearch_command($queue);break;
 						case "nmap":$this->nmap_command($queue);break;
 					}
-
+					
 					$user_package[$user->id]--;
 					break;					
 				}
 				
 				if($user_package[$user->id]<=0)continue;
 
-				foreach($user->queues()->where('status','todo')->where('object_type','scope_entry')->get() as $queue)
+				foreach($user->queues()->where('status','todo')->where('object_type','scope_entry')->limit(env('MAX_TASKS'))->get() as $queue)
 				{
 					
 					$scope_entry = ScopeEntry::find($queue->object_id);//where('id', )->get();
@@ -242,7 +246,7 @@ class Pusher extends Command
 				
 				if($user_package[$user->id]<=0)continue;
 				
-				foreach($user->queues()->where('status','todo')->get() as $queue)
+				foreach($user->queues()->where('status','todo')->limit(env('MAX_TASKS'))->get() as $queue)
 				{
 					if($queue->object_type!='resource' && $queue->object_type!='service')continue;
 					

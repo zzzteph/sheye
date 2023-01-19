@@ -23,16 +23,16 @@
                <tbody>
                   <tr>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'critical'])}}"> {{ $scope->outputs()->where('severity','critical')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'critical'])}}"> {{ $scope->critical_findings }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'high'])}}"> {{ $scope->outputs()->where('severity','high')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'high'])}}"> {{ $scope->high_findings }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'medium'])}}"> {{ $scope->outputs()->where('severity','medium')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'medium'])}}"> {{ $scope->medium_findings }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'low'])}}"> {{ $scope->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count() }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'low'])}}"> {{ $scope->low_findings }}</a>
                      </td>
                   </tr>
                </tbody>
@@ -42,23 +42,18 @@
 			   
 			                     <tr>
                      <td>Entries</td>
-                     <td><a href="{{route('scope-entry-list',['scope_id' => $scope->id])}}">{{ $scope->scope_entries()->count() }}</a></td>
+                     <td><a href="{{route('scope-entry-list',['scope_id' => $scope->id])}}">{{ $scope->scope_entries_count }}</a></td>
                      <td></td>
                   </tr>
 			   
                   <tr>
                      <td>Resources</td>
-                     <td><a href="{{route('resources-list',['id' => $scope->id])}}">{{ $scope->resources()->count() }}</a></td>
+                     <td><a href="{{route('resources-list',['id' => $scope->id])}}">{{ $scope->resources_count }}</a></td>
                      <td></td>
                   </tr>
                   <tr>
                      <td>Screenshots</td>
                      <td><a href="{{route('scope-screenshots-list',['scope_id' => $scope->id])}}">{{ $scope->screenshots_count }}</a></td>
-                     <td></td>
-                  </tr>
-                  <tr>
-                     <td>Services</td>
-                     <td><a href="{{route('services-list',['id' => $scope->id])}}">{{ $scope->services()->count() }}</a></td>
                      <td></td>
                   </tr>
                   @if($scope->progress!==FALSE && $scope->progress!==100 && $scope->progress!==0)

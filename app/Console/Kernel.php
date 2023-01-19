@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-		$schedule->command('push:queue')->withoutOverlapping();
+		$schedule->command('push:queue')->everyTwoMinutes();
 		$schedule->command('wipe:queue')->hourly();
 		$schedule->command('wipe:done')->hourly();
 		$schedule->command('wipe:storage')->hourly();
@@ -23,6 +23,10 @@ class Kernel extends ConsoleKernel
 		$schedule->command('scheduler:run weekly')->weekly();
 		$schedule->command('scheduler:run monthly')->monthly();
 		$schedule->command('scheduler:run quarterly')->quarterly();
+		
+		//rebuild cache
+		$schedule->command('data:cache')->hourly()->withoutOverlapping();
+		$schedule->command('schedule:clear-cache')->daily();
 		
 		
     }
