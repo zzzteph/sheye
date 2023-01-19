@@ -81,6 +81,7 @@ class Cacher extends Command
 				return $scope->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
 			});
 
+
 			
 			foreach($scope->scope_entries as $scope_entry)
 			{

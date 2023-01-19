@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Carbon\Carbon;
 use App\Events\NewScopeEntry;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 class ScopeEntry extends Model
 {
 	protected $touches = ['scope'];
@@ -63,10 +64,7 @@ class ScopeEntry extends Model
     {
         return $this->hasMany(Response::class)->where('size','!=',0);
     }
-	public function getScreenshotsCountAttribute()
-    {
-		return $this->responses()->where('size','>',0)->count();
-    }
+
 	public function getNewResourceCountAttribute()
     {
 		$count=0;
@@ -79,4 +77,120 @@ class ScopeEntry extends Model
 		}
 		return $count;
     }
+	
+			public function getResourcesCountAttribute()
+    {
+		if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_entry_'.$this->id."_resources", $cache_timeout, function () {
+				return $this->resources()->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->resources()->count();
+		}
+		
+    }
+	
+		
+	public function getScreenshotsCountAttribute()
+    {
+			if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_entry_'.$this->id."_screenshots", $cache_timeout, function () {
+				return $this->responses()->where('size','>',10592)->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->responses()->where('size','>',10592)->count();
+		}
+		
+		
+		
+		
+    }
+	
+	
+	
+		public function getCriticalFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_entry_'.$this->id."_critical_findings", $cache_timeout, function () {
+				return $this->outputs()->where('severity','critical')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->outputs()->where('severity','critical')->count();
+		}
+		
+    }
+	
+		public function getHighFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_entry_'.$this->id."_high_findings", $cache_timeout, function () {
+				return $this->outputs()->where('severity','high')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->outputs()->where('severity','high')->count();
+		}
+		
+    }
+	
+	
+			public function getMediumFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_entry_'.$this->id."_medium_findings", $cache_timeout, function () {
+				return $this->outputs()->where('severity','medium')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->outputs()->where('severity','medium')->count();
+		}
+		
+    }
+	
+				public function getLowFindingsCountAttribute()
+    {
+        if(env('ENABLE_DATA_CACHE')===true)
+		{
+			$cache_timeout=env('CACHE_TIMEOUT',120);
+			$count = Cache::remember('scope_entry_'.$this->id."_low_findings", $cache_timeout, function () {
+				return $this->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
+			});
+			return $count;
+		}
+		else
+		{
+			return $this->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
+		}
+		
+    }
+	
+	
+	
+	
+	
+	
+	
 }

@@ -65,13 +65,13 @@ class Scope extends Model
 		{
 			$cache_timeout=env('CACHE_TIMEOUT',120);
 			$count = Cache::remember('scope_'.$this->id."_critical_findings", $cache_timeout, function () {
-				return $scope->outputs()->where('severity','critical')->count();
+				return $this->outputs()->where('severity','critical')->count();
 			});
 			return $count;
 		}
 		else
 		{
-			return $scope->outputs()->where('severity','critical')->count();
+			return $this->outputs()->where('severity','critical')->count();
 		}
 		
     }
@@ -82,13 +82,13 @@ class Scope extends Model
 		{
 			$cache_timeout=env('CACHE_TIMEOUT',120);
 			$count = Cache::remember('scope_'.$this->id."_high_findings", $cache_timeout, function () {
-				return $scope->outputs()->where('severity','high')->count();
+				return $this->outputs()->where('severity','high')->count();
 			});
 			return $count;
 		}
 		else
 		{
-			return $scope->outputs()->where('severity','high')->count();
+			return $this->outputs()->where('severity','high')->count();
 		}
 		
     }
@@ -100,13 +100,13 @@ class Scope extends Model
 		{
 			$cache_timeout=env('CACHE_TIMEOUT',120);
 			$count = Cache::remember('scope_'.$this->id."_medium_findings", $cache_timeout, function () {
-				return $scope->outputs()->where('severity','medium')->count();
+				return $this->outputs()->where('severity','medium')->count();
 			});
 			return $count;
 		}
 		else
 		{
-			return $scope->outputs()->where('severity','medium')->count();
+			return $this->outputs()->where('severity','medium')->count();
 		}
 		
     }
@@ -117,13 +117,13 @@ class Scope extends Model
 		{
 			$cache_timeout=env('CACHE_TIMEOUT',120);
 			$count = Cache::remember('scope_'.$this->id."_low_findings", $cache_timeout, function () {
-				return $scope->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
+				return $this->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
 			});
 			return $count;
 		}
 		else
 		{
-			return $scope->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
+			return $this->outputs()->where('severity','!=','critical')->where('severity','!=','high')->where('severity','!=','medium')->count();
 		}
 		
     }
