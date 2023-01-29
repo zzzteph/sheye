@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Log;
 class NucleiScan implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -72,6 +73,15 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 		$this->template_path=$this->scanner_path."/nuclei-templates";
 		$this->scanner=$this->scanner_path."nuclei";		
 
+
+		Log::channel('NucleiScan')->debug('==============new:'.$entry->id.'==============');
+		Log::channel('NucleiScan')->debug('queue_id '.$entry->id);
+		Log::channel('NucleiScan')->debug('object_id '.$entry->object_id);
+		Log::channel('NucleiScan')->debug('object_type '.$entry->object_type);
+		Log::channel('NucleiScan')->debug('severity '.$severity);
+		Log::channel('NucleiScan')->debug('==============new==============');
+
+
 		}
 		
 		
@@ -90,6 +100,7 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
+		Log::channel('NucleiScan')->debug($this->entry->id." change status to running");
 		$this->entry->status='running';
 		$this->entry->save();
 		
@@ -102,8 +113,10 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 		
 		if($resource===null || $scope_entry===null || $scope===null)
 		{
+			Log::channel('NucleiScan')->debug($this->entry->id." unable to find service");
 			$this->entry->status='done';
 			$this->entry->save();
+			Log::channel('NucleiScan')->debug($this->entry->id." done");
 			return;
 		}
 		
@@ -111,6 +124,11 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 		$list = storage_path('app')."/".$list_name;
 		$fp = fopen($list, 'a');
 		$exist=FALSE;
+		
+		
+		Log::channel('NucleiScan')->debug($this->entry->id." nuclei file ".$list);
+
+
 
 		if(	strpos($this->service->service,"http")!==FALSE)
 		{
@@ -118,6 +136,7 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 			{
 				$exist=TRUE;
 				$url="http://".$resource->name.":".$this->service->port."/";
+				Log::channel('NucleiScan')->debug($this->entry->id." file entry ".$url);
 				fwrite($fp, $url.PHP_EOL);
 					
 			}
@@ -125,6 +144,7 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 			{
 				$exist=TRUE;
 				$url="https://".$resource->name.":".$this->service->port."/";
+				Log::channel('NucleiScan')->debug($this->entry->id." file entry ".$url);
 				fwrite($fp, $url.PHP_EOL);
 			}
 		}
@@ -139,6 +159,7 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 
 
 		$report_name="nuclei".Str::random(40).".txt";
+		Log::channel('NucleiScan')->debug($this->entry->id." report ".$report_name);
 		$report = storage_path('app')."/".$report_name;
 				$process = new Process([
 			$this->scanner,
@@ -203,7 +224,7 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 						}
 
 					}
-					
+					Log::channel('NucleiScan')->debug($this->entry->id." finding ".$vulnReport);
 					
 					
 					if($finding==null)
@@ -224,12 +245,14 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 			}
 			else
 			{
+				Log::channel('NucleiScan')->debug($this->entry->id." report is too small");
 				if($finding!=null)
 				$finding->delete();
 			}
 		}
 		else
 		{
+				Log::channel('NucleiScan')->debug($this->entry->id." report not exist");
 			if($finding!=null)
 				$finding->delete();
 		}
@@ -245,6 +268,7 @@ class NucleiScan implements ShouldQueue, ShouldBeUnique
 
 			$this->entry->status='done';
 			$this->entry->save();
+			Log::channel('NucleiScan')->debug($this->entry->id." done");
 		
     }
 }

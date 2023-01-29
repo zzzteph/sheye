@@ -12,6 +12,7 @@ use App\Models\Service;
 use App\Models\User;
 use Carbon\Carbon;
 use App\Models\CommandQueue;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 
 class ErrorJobsClear extends Command
@@ -46,13 +47,14 @@ class ErrorJobsClear extends Command
     public function handle()
     {
 		
-		
+		Log::channel('wipe:queue')->debug('===============================wipe:queue=======================================================');
 		$queues=CommandQueue::where('status','running')->get();
 		foreach($queues as $queue)
 		{
 
 			if($queue->updated_at->diffInHours(Carbon::now())>2)
 			{
+				Log::channel('wipe:queue')->debug('Changing CommandQueue jobs '.$queue->id.' to error');
 				$queue->status='error';
 				$queue->save();
 			}
@@ -67,16 +69,18 @@ class ErrorJobsClear extends Command
 		{
 			if($queue->object_type=='scope_entry')
 			{
-				if($queue->updated_at->diffInHours(Carbon::now())>1)
+				if($queue->updated_at->diffInHours(Carbon::now())>2)
 				{
+					Log::channel('wipe:queue')->debug('Changing Queue jobs(scope_entry)'.$queue->id.' from running to done ');
 					$queue->status='done';
 					$queue->save();
 				}
 			}
 			else
 			{
-				if($queue->updated_at->diffInMinutes(Carbon::now())>5)
+				if($queue->updated_at->diffInHours(Carbon::now())>2)
 				{
+					Log::channel('wipe:queue')->debug('Changing Queue jobs(resource)'.$queue->id.' from running to done ');
 					$queue->status='done';
 					$queue->save();
 				}
@@ -97,6 +101,7 @@ class ErrorJobsClear extends Command
 			
 			if($queue->created_at->diffInSeconds(Carbon::now())>7200)
 			{
+				Log::channel('wipe:queue')->debug('Changing Queue jobs'.$queue->id.' from queued to done ');
 				$queue->status='done';
 					$queue->save();
 			}
@@ -108,6 +113,7 @@ class ErrorJobsClear extends Command
 
 			if($queue->updated_at->diffInSeconds(Carbon::now())>7200)
 			{
+				Log::channel('wipe:queue')->debug('Changing CommandQueue jobs'.$queue->id.' from queued to error ');
 				$queue->status='error';
 				$queue->save();
 			}
@@ -126,6 +132,7 @@ class ErrorJobsClear extends Command
 				$resource = Resource::find($queue->object_id);
 				if($resource==null || $resource->scope_entry==null || $resource->scope_entry->scope==null)
 				{
+					Log::channel('wipe:queue')->debug('Deleting '.$queue->id.' because resource '.$queue->object_id.' is null ');
 					$queue->delete();
 				}
 				
@@ -135,6 +142,7 @@ class ErrorJobsClear extends Command
 				$service = Service::find($queue->object_id);
 				if($service->resource==null || $service->resource->scope_entry==null || $service->resource->scope_entry->scope==null)
 				{
+					Log::channel('wipe:queue')->debug('Deleting '.$queue->id.' because service '.$queue->object_id.' is null ');
 					$queue->delete();
 				}	
 			}
@@ -144,13 +152,15 @@ class ErrorJobsClear extends Command
 				$scope_entry = ScopeEntry::find($queue->object_id);
 				if( $scope_entry==null || $scope_entry->scope==null)
 				{
+					Log::channel('wipe:queue')->debug('Deleting '.$queue->id.' because scope_entry '.$queue->object_id.' is null ');
 					$queue->delete();
 				}	
 			}
 			
 			
 		}
-		
+			Log::channel('wipe:queue')->debug('================================================================================================');
+	
 		//QUEUD but not running
 
 		

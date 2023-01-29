@@ -113,6 +113,60 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+		////jobs logging
+		'discovery' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/discovery.log'),
+        ],
+		'resource' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/resource.log'),
+        ],
+		'listener' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/listener.log'),
+        ],
+		
+		//schedule jobs logs
+		'push:queues' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/schedule/push:queues.log'),
+        ],
+		
+		'data:cache' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/schedule/data:cache.log'),
+        ],
+				'wipe:storage' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/schedule/wipe:storage.log'),
+        ],
+		'wipe:queue' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/schedule/wipe:queue.log'),
+        ],
+				'sheduler' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/schedule/sheduler.log'),
+        ],
+		//resource job log
+		'AnalyzeService' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/resource/AnalyzeService.log'),
+        ],
+		'NmapJob' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/resource/NmapJob.log'),
+        ],
+		'NucleiScan' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/resource/NucleiScan.log'),
+        ],
+		'DirsearchJob' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/resource/DirsearchJob.log'),
+        ],
+		
     ],
 
 ];

@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Log;
 class AnalyzeService implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -44,6 +45,11 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 		$this->scanner=$this->scanner_path."screenshot-1.0.jar";
 		$this->httpx=base_path()."/scanners/httpx";
 		$this->time_limit=60;
+		Log::channel('AnalyzeService')->debug('==============new:'.$entry->id.'==============');
+		Log::channel('AnalyzeService')->debug('queue_id '.$entry->id);
+		Log::channel('AnalyzeService')->debug('object_id '.$entry->object_id);
+		Log::channel('AnalyzeService')->debug('object_type '.$entry->object_type);
+		Log::channel('AnalyzeService')->debug('==============new==============');
     }
 
 	public function uniqueId()
@@ -55,37 +61,53 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 
     public function handle()
     {
-		
+		Log::channel('AnalyzeService')->debug('==============running:'.$entry->id.'==============');
 		
 		$service= Service::find($this->entry->object_id);
 		if($service===null)
 		{
-			$entry->status='done';
-			$entry->save();
+			Log::channel('AnalyzeService')->debug($this->entry->id." unable to find service ".$this->entry->object_id);
+			$this->entry->status='done';
+			$this->entry->save();
+			Log::channel('AnalyzeService')->debug($this->entry->id." done");
 			return;
 		}
 		$this->service=$service;
 	
 	
 		$this->entry->status='running';
+		Log::channel('AnalyzeService')->debug($this->entry->id." change status to running");
+		
+		
+		
 		$this->entry->save();
 		
 		$service= Service::find($this->service->id);
 		if($service===null)
 		{
+			Log::channel('AnalyzeService')->debug($this->entry->id." unable to find service ".$this->entry->object_id);
 			$this->entry->status='done';
 			$this->entry->save();
+			Log::channel('AnalyzeService')->debug($this->entry->id." done");
 			return;
 		}
+		
+		
+		
 		$scope_entry= ScopeEntry::find($service->scope_entry_id);
 		$scope= Scope::find($service->scope_id);
 		$resource= Resource::find($service->resource_id);
 		if($resource===null || $scope_entry===null || $scope===null)
 		{
+			Log::channel('AnalyzeService')->debug($this->entry->id." unable to find one of the resource for service ".$this->entry->object_id);
 			$this->entry->status='done';
 			$this->entry->save();
+			Log::channel('AnalyzeService')->debug($this->entry->id." done");
 			return;
 		}
+		
+		
+		
 			if(	strpos($service->service,"http")!==FALSE || strpos($service->service,"ssl")!==FALSE)
 			{
 				$url="";
@@ -106,10 +128,13 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 				}
 				if($url==="")
 				{
+					Log::channel('AnalyzeService')->debug($this->entry->id." no url ");
 					$this->entry->status='done';
 					$this->entry->save();
+					Log::channel('AnalyzeService')->debug($this->entry->id." done");
+					return;
 				}
-				
+				Log::channel('AnalyzeService')->debug($this->entry->id." url ".$url);
 				
 				$rnd=Str::random(40);
 				
@@ -125,9 +150,10 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 				Storage::disk('public')->put($httpx_file_name,$url);
 				
 				
-				echo $path.PHP_EOL;
-				echo $preview.PHP_EOL;
-				echo $httpx_file.PHP_EOL;
+
+				Log::channel('AnalyzeService')->debug($this->entry->id." path ".$path);
+				Log::channel('AnalyzeService')->debug($this->entry->id." preview ".$preview);
+				Log::channel('AnalyzeService')->debug($this->entry->id." httpx_file ".$httpx_file);
 				
 				
 				
@@ -159,7 +185,7 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 					usleep(2000000);
 				}
 				
-				
+				Log::channel('AnalyzeService')->debug($this->entry->id." screenshot taken");
 				//mogrify screenshot
 				
 				$process = new Process([
@@ -185,7 +211,7 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 					usleep(2000000);
 				}
 				
-				
+				Log::channel('AnalyzeService')->debug($this->entry->id." mogrify done");
 				//get information with HTTPX
 				
 				$process = new Process([
@@ -216,11 +242,12 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 					usleep(2000000);
 				}
 				
-				
+				Log::channel('AnalyzeService')->debug($this->entry->id." httpx done");
 				if ($process->isSuccessful()) {
 					$httpx = json_decode($process->getOutput());
 				}
-
+				
+						
 
 				//delete HTTPX_FILE
 				Storage::disk('public')->delete($httpx_file_name);
@@ -229,7 +256,10 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 				if(file_exists($source))
 					$text=file_get_contents($source);
 				//extract title
-						
+				
+				Log::channel('AnalyzeService')->debug($this->entry->id." source text size ".strlen($text));		
+
+				
 				$title="";
 				$pos = strpos($text, "<title>");
 				if($pos!==FALSE)
@@ -282,9 +312,15 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 					}	
 				}
 
+				Log::channel('AnalyzeService')->debug($this->entry->id." title ".$title);		
+				Log::channel('AnalyzeService')->debug($this->entry->id." ip ".$ip);
+				Log::channel('AnalyzeService')->debug($this->entry->id." code ".$code);
+				Log::channel('AnalyzeService')->debug($this->entry->id." server ".$server);
+				Log::channel('AnalyzeService')->debug($this->entry->id." asn ".$asn);
+
 				
 						
-				echo $title.PHP_EOL;
+				
 				
 				$resp=Response::where('service_id',$service->id)->first();
 				if($resp==null)
@@ -296,6 +332,11 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 				{
 					$resp->path=$path;
 					$resp->size=filesize($path);
+					Log::channel('AnalyzeService')->debug($this->entry->id." ".$path." size = ".filesize($path));
+				}
+				else
+				{
+					Log::channel('AnalyzeService')->debug($this->entry->id." ".$path." not exists!");
 				}
 				if(file_exists($preview))
 					$resp->preview=$preview;
@@ -327,7 +368,7 @@ class AnalyzeService implements ShouldQueue, ShouldBeUnique
 				
 			}
 
-		
+			Log::channel('AnalyzeService')->debug($this->entry->id." done");
 			$this->entry->status='done';
 			$this->entry->save();
 		

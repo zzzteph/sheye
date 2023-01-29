@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 class CleanStorage extends Command
 {
     /**
@@ -38,6 +39,7 @@ class CleanStorage extends Command
 
     public function handle()
     {
+		Log::channel('wipe:storage')->debug('===============================WIPE:STORAGE=======================================================');
 		$folders=Storage::directories();
 		foreach($folders as $folder)
 		{
@@ -46,6 +48,7 @@ class CleanStorage extends Command
 			{
 				if(Carbon::now()->diffInDays(Carbon::parse(Storage::lastModified($folder)))>1)
 				{
+					Log::channel('wipe:storage')->debug("Deleting folder ".$folder);
 					Storage::deleteDirectory($folder);
 				}
 			}
@@ -59,11 +62,13 @@ class CleanStorage extends Command
 			{
 				if(Carbon::now()->diffInDays(Carbon::parse(Storage::lastModified($file)))>1)
 				{
+					Log::channel('wipe:storage')->debug("Deleting file ".$file);
 					Storage::delete($file);
 				}
 			}
 			catch(\League\Flysystem\UnableToRetrieveMetadata $e)
 			{
+				Log::channel('wipe:storage')->debug("Unable to delete file ".$file);
 				echo "Unable to delete $file".PHP_EOL;
 			}
 			
@@ -81,16 +86,18 @@ class CleanStorage extends Command
 			{
 				if(Carbon::now()->diffInDays(Carbon::parse(Storage::disk('public')->lastModified($file)))>1)
 				{
-					
+					Log::channel('wipe:storage')->debug("Deleting public file ".$file);
 					Storage::disk('public')->delete($file);
 				}
 			}
 			catch(\League\Flysystem\UnableToRetrieveMetadata $e)
 			{
+					Log::channel('wipe:storage')->debug("Unable to delete public file ".$file);
 				echo "Unable to delete $file".PHP_EOL;
 			}
 			
 		}
+		Log::channel('wipe:storage')->debug('==================================================================================================');
 		
 		
     }

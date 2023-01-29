@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Log;
 class NmapJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -53,6 +54,15 @@ class NmapJob implements ShouldQueue, ShouldBeUnique
 		$this->ports="22,80,443,8080,8443,445,3389,12345,5432,1433,8880,8088,6379,2375,8983,8383,4990,8500,6066,1090,1098,1099,4444,11099,47001,47002,10999,7000-7004,8000-8003,9000-9003,9503,7070,7071,45000,45001,8686,9012,50500,4848,11111,11211,4445,4786,5555,5556,5900,21,3306,1494,1521,1720,1723,1755,1761,1801,1900,1935,1998,2000-2003,2005,2049,2103,2105,2107,2121,2161,2301,2383,2401,2601,2717,2869,2967,3000-3001,3128,3268,3306,3689-3690,3703,3986,4000-4001,4045,4899,5000-5001,5003,5009,5050-5051,5060,5101,5120,5190,5357,5631,5666,5800,5901,6000-6002,6004,6112,6646,6666,7937-7938,8008-8010,8031,8081,8888,9090,9100,9102,9999-10001,10010,32768,32771,49152-49157,50000";
 		else
 		$this->ports=$ports;
+		Log::channel('NmapJob')->debug('==============new:'.$entry->id.'==============');
+		Log::channel('NmapJob')->debug('queue_id '.$entry->id);
+		Log::channel('NmapJob')->debug('object_id '.$entry->object_id);
+		Log::channel('NmapJob')->debug('object_type '.$entry->object_type);
+		Log::channel('NmapJob')->debug('ports '.$ports);
+		Log::channel('NmapJob')->debug('==============new==============');
+	
+	
+	
 	
     }
 	public function uniqueId()
@@ -67,6 +77,7 @@ class NmapJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle()
     {
+		Log::channel('NmapJob')->debug($this->entry->id." change status to running");
 		$this->entry->status='running';
 		$this->entry->save();
 		
@@ -76,14 +87,17 @@ class NmapJob implements ShouldQueue, ShouldBeUnique
 		
 		if($resource===null || $scope_entry===null || $scope===null)
 		{
+			Log::channel('NmapJob')->debug($this->entry->id." unable to find service ".$this->entry->object_id);
 			$this->entry->status='done';
 			$this->entry->save();
+			Log::channel('NmapJob')->debug($this->entry->id." done");
 			return;
 		}
 
 		$randomName="nmap".Str::random(40).".xml";
 		$report = storage_path('app')."/".$randomName;
-		
+		Log::channel('NmapJob')->debug($this->entry->id." resource to scan ".$this->resource->name);
+		Log::channel('NmapJob')->debug($this->entry->id." nmap file path ".$report);
 		
 		$process = new Process([
 			'nmap',
@@ -121,7 +135,7 @@ class NmapJob implements ShouldQueue, ShouldBeUnique
 		
 		$result=array();
 
-
+		
 		if (file_exists($report)) {
 			try{
 				
@@ -142,6 +156,11 @@ class NmapJob implements ShouldQueue, ShouldBeUnique
 										$service.=(string)$entry->{'service'}['product'][0]." ";	
 									if(isset($entry->{'service'}['version'][0]))
 										$service.=(string)$entry->{'service'}['version'][0]." " ;	
+									
+									
+									
+									
+									
 									array_push($result,array("port"=>$port,"service"=>$service));
 								}
 							}
@@ -152,10 +171,33 @@ class NmapJob implements ShouldQueue, ShouldBeUnique
 				
 			}
 		}
+		Log::channel('NmapJob')->debug($this->entry->id." number of ports ".count($result));
+		
+
+		//Filtering tcpwrapped. If tcpwrapped is more than a half - ignore them
+		$tcpwrappedFilter=false;
+		$tcpwrappedCount=0;
+		foreach($result as $entry)
+		{
+			if(strpos($entry['service'],"tcpwrapped")!==FALSE)
+			$tcpwrappedCount++;
+		}
+		if($tcpwrappedCount>=(count($result)/2))
+		{
+			$tcpwrappedFilter=true;
+			Log::channel('NmapJob')->debug($this->entry->id." need to filter tcpwrapped");
+		}
+
 
 
 		foreach($result as $entry)
 		{
+			if($tcpwrappedFilter)
+			{
+				if(strpos($entry['service'],"tcpwrapped")!==FALSE)continue;
+			}
+			
+			
 			$service=Service::where('resource_id',$this->resource->id)->where('port',$entry['port'])->first();
 			if($service==null)
 			{
@@ -177,6 +219,7 @@ class NmapJob implements ShouldQueue, ShouldBeUnique
 			if(file_exists($report))unlink($report);
 			$this->entry->status='done';
 			$this->entry->save();
+			Log::channel('NmapJob')->debug($this->entry->id." done");
 		
     }
 }

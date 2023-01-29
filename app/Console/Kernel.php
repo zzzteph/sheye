@@ -25,7 +25,7 @@ class Kernel extends ConsoleKernel
 		$schedule->command('scheduler:run quarterly')->quarterly();
 		
 		//rebuild cache
-		$schedule->command('data:cache')->hourly()->withoutOverlapping();
+		$schedule->command('data:cache')->hourly();
 		$schedule->command('schedule:clear-cache')->daily();
 		
 		

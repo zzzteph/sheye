@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Log;
 class DirsearchJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -42,6 +43,15 @@ class DirsearchJob implements ShouldQueue, ShouldBeUnique
         $this->scanner_path = base_path() . "/scanners/dirsearch/";
         $this->scanner = $this->scanner_path . "dirsearch.py";
         $this->time_limit = 1800;
+		
+		Log::channel('DirsearchJob')->debug('==============new:'.$entry->id.'==============');
+		Log::channel('DirsearchJob')->debug('queue_id '.$entry->id);
+		Log::channel('DirsearchJob')->debug('object_id '.$entry->object_id);
+		Log::channel('DirsearchJob')->debug('object_type '.$entry->object_type);
+		Log::channel('DirsearchJob')->debug('==============new==============');
+		
+		
+		
     }
 
     public function uniqueId()
@@ -57,8 +67,10 @@ class DirsearchJob implements ShouldQueue, ShouldBeUnique
             ->object_id);
         if ($service === null)
         {
+			Log::channel('DirsearchJob')->debug($this->entry->id." unable to find service");
             $entry->status = 'done';
             $entry->save();
+			Log::channel('DirsearchJob')->debug($this->entry->id." done");
             return;
         }
         $this->service = $service;
@@ -67,17 +79,19 @@ class DirsearchJob implements ShouldQueue, ShouldBeUnique
         $this
             ->entry
             ->save();
-
+		Log::channel('DirsearchJob')->debug($this->entry->id." change status to running");
         $service = Service::find($this
             ->service
             ->id);
         if ($service === null)
         {
+			Log::channel('DirsearchJob')->debug($this->entry->id." unable to find service");
             $this
                 ->entry->status = 'done';
             $this
                 ->entry
                 ->save();
+				Log::channel('DirsearchJob')->debug($this->entry->id." done");
             return;
         }
         $scope_entry = ScopeEntry::find($service->scope_entry_id);
@@ -85,11 +99,13 @@ class DirsearchJob implements ShouldQueue, ShouldBeUnique
         $resource = Resource::find($service->resource_id);
         if ($resource === null || $scope_entry === null || $scope === null)
         {
+			Log::channel('DirsearchJob')->debug($this->entry->id." unable to find resource of the service");
             $this
                 ->entry->status = 'done';
             $this
                 ->entry
                 ->save();
+				Log::channel('DirsearchJob')->debug($this->entry->id." done");
             return;
         }
 
@@ -113,17 +129,23 @@ class DirsearchJob implements ShouldQueue, ShouldBeUnique
             }
             if ($url === "")
             {
+					Log::channel('DirsearchJob')->debug($this->entry->id." url is empty");
                 $this
                     ->entry->status = 'done';
                 $this
                     ->entry
                     ->save();
+					return;
             }
 
             Storage::disk('public')
                 ->makeDirectory($scope_entry->id);
             $dirseach_output = "dirsearch" . Str::random(40);
             $report = storage_path('app') . "/" . $dirseach_output;
+
+			Log::channel('DirsearchJob')->debug($this->entry->id." url ".$url);
+			Log::channel('DirsearchJob')->debug($this->entry->id." report ".$report);
+
 
             $process = new Process([$this->scanner, '-e', 'php,aspx,jsp,html,js', '-i', '200', '--format=plain', '-o', $report, '--url', $url
 
@@ -159,6 +181,10 @@ class DirsearchJob implements ShouldQueue, ShouldBeUnique
 
 					fclose($handle);
 				}
+			 }
+			 else
+			 {
+				 Log::channel('DirsearchJob')->debug($this->entry->id." report not exist");
 			 }
 
             $finding = Output::where('resource_id', $resource->id)
@@ -201,7 +227,7 @@ class DirsearchJob implements ShouldQueue, ShouldBeUnique
             Storage::delete($dirseach_output);
 
         }
-
+ Log::channel('DirsearchJob')->debug($this->entry->id." done");
         $this
             ->entry->status = 'done';
         $this
