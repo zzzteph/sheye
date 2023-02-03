@@ -23,16 +23,16 @@
                <tbody>
                   <tr>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'critical'])}}"> {{ $scope->critical_findings }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'critical'])}}"> {{ $scope->critical_findings_count }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'high'])}}"> {{ $scope->high_findings }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'high'])}}"> {{ $scope->high_findings_count }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'medium'])}}"> {{ $scope->medium_findings }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'medium'])}}"> {{ $scope->medium_findings_count }}</a>
                      </td>
                      <td>
-                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'low'])}}"> {{ $scope->low_findings }}</a>
+                        <a href="{{route('scope-findings',['scope_id' => $scope->id,'severity'=>'low'])}}"> {{ $scope->low_findings_count }}</a>
                      </td>
                   </tr>
                </tbody>
