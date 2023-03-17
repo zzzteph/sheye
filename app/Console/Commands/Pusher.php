@@ -13,25 +13,6 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\Screenshot;
 
-use App\Jobs\Discovery\AmassJob;
-use App\Jobs\Discovery\SubfinderJob;
-use App\Jobs\Discovery\WayBack;
-use App\Jobs\Discovery\AssetJob;
-use App\Jobs\Discovery\DnsbJob;
-
-use App\Jobs\Commands\AmassCommand;
-use App\Jobs\Commands\AssetCommand;
-use App\Jobs\Commands\GauCommand;
-use App\Jobs\Commands\SubfinderCommand;
-use App\Jobs\Commands\DnsbCommand;
-use App\Jobs\Commands\NucleiCommand;
-use App\Jobs\Commands\DirsearchCommand;
-use App\Jobs\Commands\NmapCommand;
-use App\Jobs\Resource\NmapResourceScan;
-use App\Jobs\Resource\AnalyzeService;
-use App\Jobs\Resource\NucleiCriticalScan;
-use App\Jobs\Resource\NucleiHighScan;
-use App\Jobs\Resource\NucleiMediumScan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Bus;
 class Pusher extends Command
@@ -60,107 +41,6 @@ class Pusher extends Command
         parent::__construct();
     }
 
-	function analyze(Queue $entry)
-	{
-
-		return AnalyzeService::dispatch($entry);
-	}
-
-
-	function nmap_nuclei(Queue $entry)
-	{
-		Bus::chain([
-				new NmapResourceScan($entry),
-				new NucleiCriticalScan($entry),
-				new NucleiHighScan($entry),
-				new NucleiMediumScan($entry)
-
-			])->dispatch();
-		
-		return;
-	}
-
-
-	function nuclei(Queue $entry)
-	{
-				Bus::chain([
-
-				new NucleiCriticalScan($entry),
-				new NucleiHighScan($entry),
-				new NucleiMediumScan($entry)
-
-			])->dispatch();
-
-		return;
-	}
-	function nmap(Queue $entry)
-	{
-		return NmapResourceScan::dispatch($entry);
-	}
-	function asset(Queue $entry)
-	{
-		return AssetJob::dispatch($entry);
-	}
-	function subfinder(Queue $entry)
-	{
-		return SubfinderJob::dispatch($entry);
-	}
-		function wayback(Queue $entry)
-	{
-		return WayBack::dispatch($entry);
-	}
-			function dnsb(Queue $entry)
-	{
-		return DnsbJob::dispatch($entry);
-	}
-
-	
-	
-	function amass(Queue $entry)
-	{
-		return AmassJob::dispatch($entry);
-	}
-	
-	
-				function nuclei_command(CommandQueue $entry)
-	{
-		return NucleiCommand::dispatch($entry);
-	}
-	
-
-			function  dnsb_command(CommandQueue $entry)
-	{
-		return DnsbCommand::dispatch($entry);
-	}
-
-	
-		function amass_command(CommandQueue $entry)
-	{
-		return AmassCommand::dispatch($entry);
-	}
-	
-	
-		function asset_command(CommandQueue $entry)
-	{
-		return AssetCommand::dispatch($entry);
-	}
-	function subfinder_command(CommandQueue $entry)
-	{
-		return SubfinderCommand::dispatch($entry);
-	}
-		function gau_command(CommandQueue $entry)
-	{
-		return GauCommand::dispatch($entry);
-	}
-			function dirsearch_command(CommandQueue $entry)
-	{
-		return DirsearchCommand::dispatch($entry);
-	}
-	
-				function nmap_command(CommandQueue $entry)
-	{
-		return NmapCommand::dispatch($entry);
-	}
 	
 
 	
@@ -189,27 +69,6 @@ class Pusher extends Command
 			foreach ($users as $user) 
 			{
 				Log::channel('push:queues')->debug("Running tasks for user:".$user->id);
-				if($user_package[$user->id]<=0)continue;
-				foreach($user->command_queues()->where('status','todo')->limit(env('MAX_TASKS'))->get() as $queue)
-				{
-					Log::channel('push:queues')->debug("User(".$user->id.",".$user_package[$user->id].")  "."Command-queue task:".$queue->id." with type ".$queue->type." (".$user->id.")");
-					$queue->status="queued";
-					$queue->save();
-					switch($queue->type)
-					{
-						case "assetfinder":	$this->asset_command($queue);break;
-						case "amass":	$this->amass_command($queue);break;
-						case "subfinder":$this->subfinder_command($queue);break;
-						case "gau":$this->gau_command($queue);break;
-						case "dnsb":$this->dnsb_command($queue);break;
-						case "nuclei":$this->nuclei_command($queue);break;
-						case "dirsearch":$this->dirsearch_command($queue);break;
-						case "nmap":$this->nmap_command($queue);break;
-					}
-					
-					$user_package[$user->id]--;
-					break;					
-				}
 				
 				if($user_package[$user->id]<=0)continue;
 				Log::channel('push:queues')->debug("User(".$user->id.",".$user_package[$user->id].")  "."Command queues done, running general queue");
