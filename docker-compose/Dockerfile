@@ -1,7 +1,8 @@
 FROM golang:1.19.2-alpine AS build-go
 RUN apk add build-base
 RUN apk --no-cache add git
-RUN go install -v github.com/OWASP/Amass/v3/...@master
+# RUN go install -v github.com/OWASP/Amass/v3/...@master
+RUN go install -v github.com/owasp-amass/amass/v3/...@master
 RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
 RUN go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
