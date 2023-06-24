@@ -1,4 +1,4 @@
-FROM golang:1.19.2-alpine AS build-go
+FROM golang:1.20.5-alpine AS build-go
 RUN apk add build-base
 RUN apk --no-cache add git
 # RUN go install -v github.com/OWASP/Amass/v3/...@master
