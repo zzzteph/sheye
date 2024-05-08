@@ -3,12 +3,12 @@ RUN apk add build-base
 RUN apk --no-cache add git
 # RUN go install -v github.com/OWASP/Amass/v3/...@master
 RUN go install -v github.com/owasp-amass/amass/v3/...@master
-RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-RUN go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
-RUN go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@latest
-RUN go install github.com/lc/gau/v2/cmd/gau@latest
-RUN go install github.com/tomnomnom/assetfinder@latest
+RUN go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@v2.6.3
+RUN go install -v github.com/projectdiscovery/httpx/cmd/httpx@v1.3.5
+RUN go install -v github.com/projectdiscovery/nuclei/v2/cmd/nuclei@v2.9.15
+RUN go install -v github.com/projectdiscovery/dnsx/cmd/dnsx@v1.1.6
+RUN go install github.com/lc/gau/v2/cmd/gau@v2.1.2
+RUN go install github.com/tomnomnom/assetfinder@v0.1.1
 
 
 
