@@ -1,6 +1,0 @@
-
-   INFO  Processing jobs from the [resource] queue.  
-
-  2022-10-18 20:44:00 App\Jobs\Resource\NucleiMediumSc . . .. 97,388.59ms FAIL
-  2022-10-18 20:45:19 App\Jobs\Resource\NmapResourceScan .... 69,798.44ms DONE
-  2022-10-18 20:43:53 App\Jobs\Resource\NucleiCriticalScan .. 84,891.43ms FAIL
